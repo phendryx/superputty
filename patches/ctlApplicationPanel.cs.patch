@@ -1,0 +1,52 @@
+37a38,64
+> 
+>         /*************************** Begin Hack to watch for windows focus change events **************************************
+>          * This is based on this form post:
+>          * http://social.msdn.microsoft.com/Forums/en-US/clr/thread/c04e343f-f2e7-469a-8a54-48ca84f78c28
+>          * 
+>          * The idea is to watch for the EVENT_SYSTEM_FOREGROUND window, and when we see that from the putty terminal window
+>          * bring the superputty window to the foreground
+>          */
+>         const uint EVENT_SYSTEM_FOREGROUND = 3;
+>         const uint WINEVENT_OUTOFCONTEXT = 0;
+> 
+>         [DllImport("user32.dll")]
+>         static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+> 
+>         [DllImport("user32.dll")]
+>         static extern bool UnhookWinEvent(IntPtr hWinEventHook);        
+> 
+>         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+>         WinEventDelegate _WinEventDelegate;
+>         IntPtr m_hWinEventHook;
+> 
+>         public ApplicationPanel()
+>         {
+>             // setup up the hook to watch for all EVENT_SYSTEM_FOREGROUND events system wide
+>             this._WinEventDelegate = new WinEventDelegate(WinEventProc);
+>             m_hWinEventHook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, this._WinEventDelegate, 0, 0, WINEVENT_OUTOFCONTEXT);
+>         }
+38a66,88
+>         protected override void Finalize()
+>         {
+>             UnhookWinEvent(m_hWinEventHook);            
+>         }
+> 
+> 		//http://social.msdn.microsoft.com/Forums/en-US/clr/thread/c04e343f-f2e7-469a-8a54-48ca84f78c28
+>         void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+>         {
+>             // if we got the EVENT_SYSTEM_FOREGROUND, and the hwnd is the putty terminal hwnd (m_AppWin)
+>             // then bring the supperputty window to the foreground
+>             if (eventType == EVENT_SYSTEM_FOREGROUND && hwnd == m_AppWin)
+>             {
+>                 // This is the easiest way I found to get the superputty window to be brought to the top
+>                 // if you leave TopMost = true; then the window will always be on top.
+>                 this.TopLevelControl.FindForm().TopMost = true;
+>                 this.TopLevelControl.FindForm().TopMost = false;
+>             }
+>         }
+> 
+>         /*************************** End Hack to watch for windows focus change events ***************************************/
+> 
+> 
+> 
