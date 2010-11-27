@@ -72,6 +72,7 @@
         	this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
         	this.LoginTextBox = new System.Windows.Forms.ToolStripTextBox();
         	this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+        	this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
         	this.menuStrip1.SuspendLayout();
         	this.toolStripContainer1.ContentPanel.SuspendLayout();
         	this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -171,6 +172,7 @@
         	this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
         	        	        	this.documentationToolStripMenuItem,
         	        	        	this.debugLogToolStripMenuItem,
+        	        	        	this.toolStripMenuItem3,
         	        	        	this.toolStripSeparator1,
         	        	        	this.aboutSuperPuTTYToolStripMenuItem});
         	this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
@@ -365,6 +367,13 @@
         	this.toolStripButton1.Text = "Connect";
         	this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
         	// 
+        	// toolStripMenuItem3
+        	// 
+        	this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+        	this.toolStripMenuItem3.Size = new System.Drawing.Size(175, 22);
+        	this.toolStripMenuItem3.Text = "Check for Updates";
+        	this.toolStripMenuItem3.Click += new System.EventHandler(this.ToolStripMenuItem3Click);
+        	// 
         	// frmSuperPutty
         	// 
         	this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -388,6 +397,7 @@
         	this.ConnectToolStrip.PerformLayout();
         	this.ResumeLayout(false);
         }
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
 
         #endregion
 

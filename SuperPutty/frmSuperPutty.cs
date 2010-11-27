@@ -20,15 +20,17 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-using System.Diagnostics;
-using System.IO;
+
 using Microsoft.Win32;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -134,6 +136,9 @@ namespace SuperPutty
              * Parsing CL Arguments
              */
             ParseClArguments(args);
+            
+            // Check for updates.
+            ToolStripMenuItem3Click(null, null);
         }
 
         /// <summary>
@@ -460,5 +465,37 @@ namespace SuperPutty
             base.WndProc(ref m);
         }
 
+        
+        void ToolStripMenuItem3Click(object sender, EventArgs e)
+        {
+			string url = "https://github.com/phendryx/superputty/raw/setup/VERSION";
+	        string text = "";
+			using (WebClient client = new WebClient())
+	        {
+	            text = client.DownloadString(url);
+	        }
+
+			string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
+			
+			object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
+
+			string thisVersion = "";
+			foreach (object o in attrs)
+			{
+				if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
+				{
+					thisVersion = ((System.Reflection.AssemblyFileVersionAttribute)o).Version;
+				}
+			}
+
+			if (thisVersion != version[0])
+			{
+				if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+					Process.Start(version[1]);
+				}
+					
+			}			
+        
+        }
     }
 }
