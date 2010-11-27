@@ -473,7 +473,7 @@ namespace SuperPutty
         
         void checkForUpdate(bool automatic)
         {
-			string url = "https://github.com/phendryx/superputty/raw/setup/VERSION";
+			string url = "https://github.com/phendryx/superputty/raw/master/VERSION";
 	        string text = "";
 			using (WebClient client = new WebClient())
 	        {
@@ -505,6 +505,11 @@ namespace SuperPutty
 					MessageBox.Show("No new version available.", "SuperPutty");
 				}
 			}        	
+        }
+        
+        void ToolStripMenuItem4Click(object sender, EventArgs e)
+        {
+        	Process.Start("http://superputty.vanillaforums.com/");
         }
     }
 }

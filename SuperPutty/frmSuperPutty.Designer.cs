@@ -58,6 +58,8 @@
         	this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.documentationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.debugLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+        	this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
+        	this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripMenuItem();
         	this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
         	this.aboutSuperPuTTYToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.dockPanel1 = new WeifenLuo.WinFormsUI.Docking.DockPanel();
@@ -72,7 +74,6 @@
         	this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
         	this.LoginTextBox = new System.Windows.Forms.ToolStripTextBox();
         	this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-        	this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripMenuItem();
         	this.menuStrip1.SuspendLayout();
         	this.toolStripContainer1.ContentPanel.SuspendLayout();
         	this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -173,6 +174,7 @@
         	        	        	this.documentationToolStripMenuItem,
         	        	        	this.debugLogToolStripMenuItem,
         	        	        	this.toolStripMenuItem3,
+        	        	        	this.toolStripMenuItem4,
         	        	        	this.toolStripSeparator1,
         	        	        	this.aboutSuperPuTTYToolStripMenuItem});
         	this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
@@ -182,27 +184,41 @@
         	// documentationToolStripMenuItem
         	// 
         	this.documentationToolStripMenuItem.Name = "documentationToolStripMenuItem";
-        	this.documentationToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+        	this.documentationToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
         	this.documentationToolStripMenuItem.Text = "Documentation";
         	this.documentationToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem1_Click);
         	// 
         	// debugLogToolStripMenuItem
         	// 
         	this.debugLogToolStripMenuItem.Name = "debugLogToolStripMenuItem";
-        	this.debugLogToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+        	this.debugLogToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
         	this.debugLogToolStripMenuItem.Text = "Debug Log";
         	this.debugLogToolStripMenuItem.Visible = false;
         	this.debugLogToolStripMenuItem.Click += new System.EventHandler(this.debugLogToolStripMenuItem_Click);
         	// 
+        	// toolStripMenuItem3
+        	// 
+        	this.toolStripMenuItem3.Name = "toolStripMenuItem3";
+        	this.toolStripMenuItem3.Size = new System.Drawing.Size(189, 22);
+        	this.toolStripMenuItem3.Text = "Check for Updates";
+        	this.toolStripMenuItem3.Click += new System.EventHandler(this.ToolStripMenuItem3Click);
+        	// 
+        	// toolStripMenuItem4
+        	// 
+        	this.toolStripMenuItem4.Name = "toolStripMenuItem4";
+        	this.toolStripMenuItem4.Size = new System.Drawing.Size(189, 22);
+        	this.toolStripMenuItem4.Text = "Forums / Community";
+        	this.toolStripMenuItem4.Click += new System.EventHandler(this.ToolStripMenuItem4Click);
+        	// 
         	// toolStripSeparator1
         	// 
         	this.toolStripSeparator1.Name = "toolStripSeparator1";
-        	this.toolStripSeparator1.Size = new System.Drawing.Size(172, 6);
+        	this.toolStripSeparator1.Size = new System.Drawing.Size(186, 6);
         	// 
         	// aboutSuperPuTTYToolStripMenuItem
         	// 
         	this.aboutSuperPuTTYToolStripMenuItem.Name = "aboutSuperPuTTYToolStripMenuItem";
-        	this.aboutSuperPuTTYToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+        	this.aboutSuperPuTTYToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
         	this.aboutSuperPuTTYToolStripMenuItem.Text = "About SuperPuTTY";
         	this.aboutSuperPuTTYToolStripMenuItem.Click += new System.EventHandler(this.aboutSuperPuttyToolStripMenuItem_Click);
         	// 
@@ -367,13 +383,6 @@
         	this.toolStripButton1.Text = "Connect";
         	this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
         	// 
-        	// toolStripMenuItem3
-        	// 
-        	this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-        	this.toolStripMenuItem3.Size = new System.Drawing.Size(175, 22);
-        	this.toolStripMenuItem3.Text = "Check for Updates";
-        	this.toolStripMenuItem3.Click += new System.EventHandler(this.ToolStripMenuItem3Click);
-        	// 
         	// frmSuperPutty
         	// 
         	this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -397,6 +406,7 @@
         	this.ConnectToolStrip.PerformLayout();
         	this.ResumeLayout(false);
         }
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;
 
         #endregion
