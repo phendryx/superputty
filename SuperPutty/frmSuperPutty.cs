@@ -20,7 +20,6 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -77,7 +76,7 @@ namespace SuperPutty
 
         private SessionTreeview m_Sessions;
 
-        public frmSuperPutty(string[] args)
+        public frmSuperPutty()
         {
             // Get Registry Entry for Putty Exe
             RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Jim Radford\SuperPuTTY\Settings");
@@ -130,10 +129,6 @@ namespace SuperPutty
             m_Sessions = new SessionTreeview(dockPanel1);
             m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
 
-            /*
-             * Parsing CL Arguments
-             */
-            ParseClArguments(args);
         }
 
         /// <summary>
@@ -242,153 +237,73 @@ namespace SuperPutty
             logView.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockBottomAutoHide);
         }
 
-        public void ParseClArguments(string[] args)
+        private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            SessionData sessionData = null;
-            bool use_scp = false;
-            if (args.Length > 0)
+            SessionData sessionData = new SessionData();
+
+            sessionData.Host = HostTextBox.Text;
+            sessionData.Port = Convert.ToInt32(PortTextBox.Text);
+            sessionData.Proto = (ProtocolBox.Text == "SCP") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH") : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), ProtocolBox.Text);
+            sessionData.PuttySession = "Default Session";
+            sessionData.SessionName = HostTextBox.Text;
+            sessionData.Username = LoginTextBox.Text;
+
+            if (ProtocolBox.Text == "SCP")
             {
-                sessionData = new SessionData();
-                string proto = "", port = "", username = "", puttySession = "", password = "";
-                for (int i = 0; i < args.Length - 1; i++)
+                RemoteFileListPanel dir = null;
+                bool cancelShow = false;
+                if (sessionData != null)
                 {
-                    switch (args[i].ToString().ToLower())
+                    PuttyClosedCallback callback = delegate(bool error)
                     {
-                        case "-ssh":
-                            proto = "SSH";
-                            break;
+                        cancelShow = error;
+                    };
+                    PscpTransfer xfer = new PscpTransfer(sessionData);
+                    xfer.PuttyClosed = callback;
 
-                        case "-serial":
-                            proto = "Serial";
-                            break;
-
-                        case "-telnet":
-                            proto = "Telnet";
-                            break;
-
-                        case "-scp":
-                            proto = "SSH";
-                            use_scp = true;
-                            break;
-
-                        case "-raw":
-                            proto = "Raw";
-                            break;
-
-                        case "-rlogin":
-                            proto = "Rlogin";
-                            break;
-
-                        case "-P":
-                            port = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-l":
-                            username = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-pw":
-                            password = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-load":
-                            puttySession = args[i + 1];
-                            sessionData.PuttySession = args[i + 1];
-                            i++;
-                            break;
+                    dir = new RemoteFileListPanel(xfer, dockPanel1, sessionData);
+                    if (!cancelShow)
+                    {
+                        dir.Show(dockPanel1);
                     }
-                }
-                sessionData.Host = args[args.Length - 1];
-                sessionData.SessionName = args[args.Length - 1];
-
-                sessionData.Proto = (proto != "") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), proto) : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH");
-                sessionData.Port = (port != "") ? Convert.ToInt32(port) : 22;
-                sessionData.Username = (username != "") ? username : "";
-                sessionData.Password = (password != "") ? password : "";
-                sessionData.PuttySession = (puttySession != "") ? puttySession : "Default Session";
-
-                if (use_scp)
-                {
-                    CreateRemoteFileListPanel(sessionData);
-                }
-                else
-                {
-                    CreatePuttyPanel(sessionData);
                 }
             }
-        }
-
-        public void CreatePuttyPanel(SessionData sessionData)
-        {
-            ctlPuttyPanel sessionPanel = null;
-
-            // This is the callback fired when the panel containing the terminal is closed
-            // We use this to save the last docking location
-            PuttyClosedCallback callback = delegate(bool closed)
+            else
             {
-                if (sessionPanel != null)
+                ctlPuttyPanel sessionPanel = null;
+
+                // This is the callback fired when the panel containing the terminal is closed
+                // We use this to save the last docking location
+                PuttyClosedCallback callback = delegate(bool closed)
                 {
-                    // save the last dockstate (if it has been changed)
-                    if (sessionData.LastDockstate != sessionPanel.DockState
-                        && sessionPanel.DockState != DockState.Unknown
-                        && sessionPanel.DockState != DockState.Hidden)
+                    if (sessionPanel != null)
                     {
-                        sessionData.LastDockstate = sessionPanel.DockState;
-                        sessionData.SaveToRegistry();
-                    }
-    
-                    if (sessionPanel.InvokeRequired)
-                    {
-                        this.BeginInvoke((MethodInvoker)delegate()
+                        // save the last dockstate (if it has been changed)
+                        if (sessionData.LastDockstate != sessionPanel.DockState
+                            && sessionPanel.DockState != DockState.Unknown
+                            && sessionPanel.DockState != DockState.Hidden)
+                        {
+                            sessionData.LastDockstate = sessionPanel.DockState;
+                            sessionData.SaveToRegistry();
+                        }
+
+                        if (sessionPanel.InvokeRequired)
+                        {
+                            this.BeginInvoke((MethodInvoker)delegate()
+                            {
+                                sessionPanel.Close();
+                            });
+                        }
+                        else
                         {
                             sessionPanel.Close();
-                         });
+                        }
                     }
-                    else
-                    {
-                        sessionPanel.Close();
-                    }
-                }
-            };
-
-            sessionPanel = new ctlPuttyPanel(sessionData, callback);
-            sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
-        }
-
-        public void CreateRemoteFileListPanel(SessionData sessionData)
-        {
-            RemoteFileListPanel dir = null;
-            bool cancelShow = false;
-            if (sessionData != null)
-            {
-                PuttyClosedCallback callback = delegate(bool error)
-                {
-                    cancelShow = error;
                 };
-                PscpTransfer xfer = new PscpTransfer(sessionData);
-                xfer.PuttyClosed = callback;
 
-                dir = new RemoteFileListPanel(xfer, dockPanel1, sessionData);
-                if (!cancelShow)
-                {
-                    dir.Show(dockPanel1);
-                }
+                sessionPanel = new ctlPuttyPanel(sessionData, callback);
+                sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
             }
-        }
-
-        protected override void WndProc(ref Message m)
-        {
-            if (m.Msg == 0x004A)
-            {
-                COPYDATA cd = (COPYDATA) Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
-                string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
-                string[] args = strArgs.Split(' ');
-                ParseClArguments(args);
-            }
-            base.WndProc(ref m);
         }
 
     }

@@ -20,58 +20,26 @@
  */
 
 using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading;
 
 namespace SuperPutty
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct COPYDATA
-    {
-        public uint dwData;
-        public uint cbData;
-        public IntPtr lpData;
-    }
-
     static class Program
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, int wParam, IntPtr lParam);
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main(string[] args)
+        static void Main()
         {
             bool onlyInstance = false;
             Mutex mutex = new Mutex(true, "SuperPutty", out onlyInstance);
             if (!onlyInstance)
             {
-                string strArgs = "";
-                foreach(string s in args)
-                {
-                    strArgs += " " + s;
-                }
 
-                COPYDATA cd = new COPYDATA();
-                cd.dwData = 0;
-                cd.cbData = (uint)strArgs.Length + 1;
-
-                cd.lpData = Marshal.StringToHGlobalAnsi(strArgs);
-                IntPtr lpPtr = Marshal.AllocHGlobal(Marshal.SizeOf(cd));
-                Marshal.StructureToPtr(cd, lpPtr, true);
-                Process[] plist = Process.GetProcessesByName("SuperPutty");
-                foreach (Process spProcess in plist)
-                {
-                    SendMessage(spProcess.MainWindowHandle, 0x004A, 0, lpPtr);
-                }
-                Marshal.FreeHGlobal(lpPtr);
             }
-            else
-            {
             
 #if DEBUG
             Logger.OnLog += delegate(string logMessage)
@@ -82,9 +50,7 @@ namespace SuperPutty
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmSuperPutty(args));
-
-            }
+            Application.Run(new frmSuperPutty());
         }
     }
 }
