@@ -280,6 +280,7 @@
         	dockPanelSkin1.DockPaneStripSkin = dockPaneStripSkin1;
         	this.dockPanel1.Skin = dockPanelSkin1;
         	this.dockPanel1.TabIndex = 3;
+        	this.dockPanel1.ActiveContentChanged += new System.EventHandler(this.DockPanel1ActiveContentChanged);
         	// 
         	// toolStripContainer1
         	// 

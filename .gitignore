@@ -1,2 +1,5 @@
 SuperPutty/obj*
-bin*
+bin/*
+!bin/*.dll
+!bin/*.DLL
+

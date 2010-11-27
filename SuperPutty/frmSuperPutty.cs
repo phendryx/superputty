@@ -30,29 +30,19 @@ using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
-
 using Microsoft.Win32;
 using WeifenLuo.WinFormsUI.Docking;
+using System.Data.SQLite;
 
 namespace SuperPutty
 {
     public partial class frmSuperPutty : Form
     {
         private static string _PuttyExe;
-
         public static string PuttyExe
         {
             get { return _PuttyExe; }
-            set
-            {
-                _PuttyExe = value;
-
-                if (File.Exists(value))
-                {
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Jim Radford\SuperPuTTY\Settings");
-                    key.SetValue("PuTTYExe", value);
-                }
-            }
+            set { _PuttyExe = value; }
         }
 
         private static string _PscpExe;
@@ -60,16 +50,7 @@ namespace SuperPutty
         public static string PscpExe
         {
             get { return _PscpExe; }
-            set
-            {
-                _PscpExe = value;
-
-                if (File.Exists(value))
-                {
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey(@"Software\Jim Radford\SuperPuTTY\Settings");
-                    key.SetValue("PscpExe", value);
-                }
-            }
+            set { _PscpExe = value; }
         }
 
         public static bool IsScpEnabled
@@ -78,24 +59,24 @@ namespace SuperPutty
         }
 
         private SessionTreeview m_Sessions;
-
+		private Classes.Database m_db;
+		
         public frmSuperPutty(string[] args)
         {
-            // Get Registry Entry for Putty Exe
-            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\Jim Radford\SuperPuTTY\Settings");
-            if (key != null)
-            {
-                string puttyExe = key.GetValue("PuTTYExe", "").ToString();
-                if (File.Exists(puttyExe))
-                {
-                    PuttyExe = puttyExe;
-                }
+            // Check SQLite Database
+            openOrCreateSQLiteDatabase();
 
-                string pscpExe = key.GetValue("PscpExe", "").ToString();
-                if (File.Exists(pscpExe))
-                {
-                    PscpExe = pscpExe;
-                }
+            #region Exe Paths
+            // Get putty executable path
+            if (File.Exists(this.m_db.GetKey("putty_exe")))
+            {
+                PuttyExe = this.m_db.GetKey("putty_exe");
+            }
+
+            // Get pscp executable path
+            if (File.Exists(this.m_db.GetKey("pscp_exe")))
+            {
+                PscpExe = this.m_db.GetKey("pscp_exe");
             }
 
             if (String.IsNullOrEmpty(PuttyExe))
@@ -103,8 +84,10 @@ namespace SuperPutty
                 dlgFindPutty dialog = new dlgFindPutty();
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    PuttyExe = dialog.PuttyLocation;
-                    PscpExe = dialog.PscpLocation;
+                	this.m_db.SetKey("putty_exe", dialog.PuttyLocation);
+                	this.m_db.SetKey("pscp_exe", dialog.PscpLocation);
+		            PuttyExe = this.m_db.GetKey("putty_exe");
+		            PscpExe = this.m_db.GetKey("pscp_exe");
                 }
             }
 
@@ -115,6 +98,7 @@ namespace SuperPutty
                 Application.Exit();
                 System.Environment.Exit(1);
             }
+			#endregion
 
             InitializeComponent();
 
@@ -510,6 +494,17 @@ namespace SuperPutty
         void ToolStripMenuItem4Click(object sender, EventArgs e)
         {
         	Process.Start("http://superputty.vanillaforums.com/");
+        }
+        
+        void DockPanel1ActiveContentChanged(object sender, EventArgs e)
+        {
+        	
+        }
+        
+        private void openOrCreateSQLiteDatabase()
+        {
+        	this.m_db = new SuperPutty.Classes.Database();
+        	this.m_db.Open();
         }
     }
 }
