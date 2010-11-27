@@ -138,7 +138,7 @@ namespace SuperPutty
             ParseClArguments(args);
             
             // Check for updates.
-            ToolStripMenuItem3Click(null, null);
+            checkForUpdate(true);
         }
 
         /// <summary>
@@ -468,6 +468,11 @@ namespace SuperPutty
         
         void ToolStripMenuItem3Click(object sender, EventArgs e)
         {
+        	checkForUpdate(false);
+        }
+        
+        void checkForUpdate(bool automatic)
+        {
 			string url = "https://github.com/phendryx/superputty/raw/setup/VERSION";
 	        string text = "";
 			using (WebClient client = new WebClient())
@@ -477,9 +482,8 @@ namespace SuperPutty
 
 			string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
 			
-			object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
-
 			string thisVersion = "";
+			object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
 			foreach (object o in attrs)
 			{
 				if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
@@ -490,12 +494,17 @@ namespace SuperPutty
 
 			if (thisVersion != version[0])
 			{
-				if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+				if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "SuperPutty - New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes) {
 					Process.Start(version[1]);
 				}
-					
 			}			
-        
+			else
+			{
+				if (!automatic)
+				{
+					MessageBox.Show("No new version available.", "SuperPutty");
+				}
+			}        	
         }
     }
 }
