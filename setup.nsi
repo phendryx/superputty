@@ -8,7 +8,7 @@
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\SuperPutty"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "superputty-setup.exe"
+OutFile "superputty-setup_v1.0.2.exe"
 
 LicenseData "License.txt"
 LicenseText "If you accept the terms of the agreement, click I Agree to continue. You must accept the agreement to install ${APPNAMEANDVERSION}."
@@ -22,8 +22,9 @@ Section "SuperPutty"
 
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
-	File "bin\Debug\SuperPutty.exe"
-	File "bin\Debug\WeifenLuo.WinFormsUI.Docking.dll"
+	File "bin\Release\SuperPutty.exe"
+	File "bin\Release\System.Data.SQLite.DLL"
+	File "bin\Release\WeifenLuo.WinFormsUI.Docking.dll"
 	CreateShortCut "$DESKTOP\SuperPutty.lnk" "$INSTDIR\SuperPutty.exe"
 	CreateDirectory "$SMPROGRAMS\SuperPutty"
 	CreateShortCut "$SMPROGRAMS\SuperPutty\SuperPutty.lnk" "$INSTDIR\SuperPutty.exe"
@@ -37,6 +38,10 @@ Section -FinishSection
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "UninstallString" "$INSTDIR\uninstall.exe"
 	WriteUninstaller "$INSTDIR\uninstall.exe"
+
+	MessageBox MB_YESNO "Would you like to run ${APPNAMEANDVERSION}?" IDNO NoRun
+		Exec "$INSTDIR\SuperPutty.exe"
+	NoRun:
 
 SectionEnd
 
@@ -57,6 +62,7 @@ Section Uninstall
 
 	; Clean up SuperPutty
 	Delete "$INSTDIR\SuperPutty.exe"
+	Delete "$INSTDIR\System.Data.SQLite.DLL"
 	Delete "$INSTDIR\WeifenLuo.WinFormsUI.Docking.dll"
 
 	; Remove remaining directories

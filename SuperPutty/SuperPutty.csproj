@@ -54,6 +54,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=2.3.1.41552, Culture=neutral, processorArchitecture=MSIL">
@@ -77,6 +78,14 @@
     </Compile>
     <Compile Include="DebugLogViewer.Designer.cs">
       <DependentUpon>DebugLogViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="dlgEditSession.cs" />
+    <Compile Include="dlgEditSession.Designer.cs">
+      <DependentUpon>dlgEditSession.cs</DependentUpon>
+    </Compile>
+    <Compile Include="dlgLogin.cs" />
+    <Compile Include="dlgLogin.Designer.cs">
+      <DependentUpon>dlgLogin.cs</DependentUpon>
     </Compile>
     <Compile Include="dlgMouseFeedback.cs">
       <SubType>Form</SubType>
@@ -103,23 +112,11 @@
     <Compile Include="dlgFindPutty.Designer.cs">
       <DependentUpon>dlgFindPutty.cs</DependentUpon>
     </Compile>
-    <Compile Include="dlgLogin.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dlgLogin.Designer.cs">
-      <DependentUpon>dlgLogin.cs</DependentUpon>
-    </Compile>
     <Compile Include="frmSuperPutty.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSuperPutty.Designer.cs">
       <DependentUpon>frmSuperPutty.cs</DependentUpon>
-    </Compile>
-    <Compile Include="dlgEditSession.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="dlgEditSession.Designer.cs">
-      <DependentUpon>dlgEditSession.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -131,6 +128,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="DebugLogViewer.resx">
       <DependentUpon>DebugLogViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dlgEditSession.resx">
+      <DependentUpon>dlgEditSession.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="dlgLogin.resx">
+      <DependentUpon>dlgLogin.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="dlgMouseFeedback.resx">
       <DependentUpon>dlgMouseFeedback.cs</DependentUpon>
@@ -144,15 +147,8 @@
     <EmbeddedResource Include="dlgFindPutty.resx">
       <DependentUpon>dlgFindPutty.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="dlgLogin.resx">
-      <DependentUpon>dlgLogin.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="frmSuperPutty.resx">
       <DependentUpon>frmSuperPutty.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="dlgEditSession.resx">
-      <DependentUpon>dlgEditSession.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
