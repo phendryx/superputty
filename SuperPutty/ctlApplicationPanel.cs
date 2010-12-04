@@ -116,6 +116,14 @@ namespace SuperPutty
         }
         #endregion
 
+        #region Public Member Variables
+        public string ApplicationWindowTitle
+        {
+        	get { return this.m_Process.MainWindowTitle; }
+        }
+
+        #endregion
+
         #region Pinvoke/Win32 Methods
 
         [DllImport("user32.dll", SetLastError = true)]
