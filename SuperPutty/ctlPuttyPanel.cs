@@ -38,6 +38,12 @@ namespace SuperPutty
         private ApplicationPanel applicationwrapper1;
         private SessionData m_Session;
         private PuttyClosedCallback m_ApplicationExit;
+
+        public string ApplicationTitle
+        {
+        	get { return this.applicationwrapper1.ApplicationWindowTitle; }
+        }
+
         public ctlPuttyPanel(SessionData session, PuttyClosedCallback callback)
         {
             m_Session = session;
