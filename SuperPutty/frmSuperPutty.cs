@@ -135,6 +135,9 @@ namespace SuperPutty
             if (dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
+
+	            this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
+				p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
                 p.SetFocusToChildApplication();
             }
         }
