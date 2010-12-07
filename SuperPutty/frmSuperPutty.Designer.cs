@@ -73,7 +73,9 @@
         	this.PortTextBox = new System.Windows.Forms.ToolStripTextBox();
         	this.toolStripLabel3 = new System.Windows.Forms.ToolStripLabel();
         	this.LoginTextBox = new System.Windows.Forms.ToolStripTextBox();
+			this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
         	this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+			this.PasswordTextBox = new System.Windows.Forms.ToolStripTextBox();
         	this.menuStrip1.SuspendLayout();
         	this.toolStripContainer1.ContentPanel.SuspendLayout();
         	this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -316,6 +318,8 @@
         	        	        	this.PortTextBox,
         	        	        	this.toolStripLabel3,
         	        	        	this.LoginTextBox,
+									this.toolStripLabel5,
+									this.PasswordTextBox,
         	        	        	this.toolStripButton1});
         	this.ConnectToolStrip.Location = new System.Drawing.Point(3, 24);
         	this.ConnectToolStrip.Name = "ConnectToolStrip";
@@ -350,6 +354,7 @@
         	// 
         	this.HostTextBox.Name = "HostTextBox";
         	this.HostTextBox.Size = new System.Drawing.Size(150, 25);
+			this.HostTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.HostTextBox_KeyPress);
         	// 
         	// toolStripLabel4
         	// 
@@ -373,6 +378,13 @@
         	// 
         	this.LoginTextBox.Name = "LoginTextBox";
         	this.LoginTextBox.Size = new System.Drawing.Size(100, 25);
+			this.LoginTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.HostTextBox_KeyPress);
+			// 
+            // toolStripLabel5
+            // 
+            this.toolStripLabel5.Name = "toolStripLabel5";
+            this.toolStripLabel5.Size = new System.Drawing.Size(53, 22);
+            this.toolStripLabel5.Text = "Password";
         	// 
         	// toolStripButton1
         	// 
@@ -383,6 +395,12 @@
         	this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
         	this.toolStripButton1.Text = "Connect";
         	this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+			// 
+           // PasswordTextBox
+           // 
+           this.PasswordTextBox.Name = "PasswordTextBox";
+           this.PasswordTextBox.Size = new System.Drawing.Size(100, 25);
+			this.PasswordTextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.HostTextBox_KeyPress);
         	// 
         	// frmSuperPutty
         	// 
@@ -440,6 +458,8 @@
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel4;
         private System.Windows.Forms.ToolStripTextBox PortTextBox;
+		 private System.Windows.Forms.ToolStripLabel toolStripLabel5;
+        private System.Windows.Forms.ToolStripTextBox PasswordTextBox;
     }
 }
 

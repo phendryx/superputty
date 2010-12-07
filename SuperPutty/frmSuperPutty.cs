@@ -107,7 +107,12 @@ namespace SuperPutty
             debugLogToolStripMenuItem.Visible = true;
 #endif
 
-
+			//Activate PasswordChar for passwordfield in connectbar
+            PasswordTextBox.TextBox.UseSystemPasswordChar = true;
+			
+			//Select protocol SSH
+            ProtocolBox.SelectedItem = ProtocolBox.Items[0];
+			
             dockPanel1.ActiveDocumentChanged += dockPanel1_ActiveDocumentChanged;
 
             /* 
@@ -241,65 +246,18 @@ namespace SuperPutty
             sessionData.Host = HostTextBox.Text;
             sessionData.Port = Convert.ToInt32(PortTextBox.Text);
             sessionData.Proto = (ProtocolBox.Text == "SCP") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH") : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), ProtocolBox.Text);
-            sessionData.PuttySession = "Default Session";
+            sessionData.PuttySession = "Default Settings";
             sessionData.SessionName = HostTextBox.Text;
             sessionData.Username = LoginTextBox.Text;
+			sessionData.Password = PasswordTextBox.Text;
 
-            if (ProtocolBox.Text == "SCP")
+            if (ProtocolBox.Text == "SCP" && IsScpEnabled)
             {
-                RemoteFileListPanel dir = null;
-                bool cancelShow = false;
-                if (sessionData != null)
-                {
-                    PuttyClosedCallback callback = delegate(bool error)
-                    {
-                        cancelShow = error;
-                    };
-                    PscpTransfer xfer = new PscpTransfer(sessionData);
-                    xfer.PuttyClosed = callback;
-
-                    dir = new RemoteFileListPanel(xfer, dockPanel1, sessionData);
-                    if (!cancelShow)
-                    {
-                        dir.Show(dockPanel1);
-                    }
-                }
+				CreateRemoteFileListPanel(sessionData);
             }
             else
             {
-                ctlPuttyPanel sessionPanel = null;
-
-                // This is the callback fired when the panel containing the terminal is closed
-                // We use this to save the last docking location
-                PuttyClosedCallback callback = delegate(bool closed)
-                {
-                    if (sessionPanel != null)
-                    {
-                        // save the last dockstate (if it has been changed)
-                        if (sessionData.LastDockstate != sessionPanel.DockState
-                            && sessionPanel.DockState != DockState.Unknown
-                            && sessionPanel.DockState != DockState.Hidden)
-                        {
-                            sessionData.LastDockstate = sessionPanel.DockState;
-                            sessionData.SaveToRegistry();
-                        }
-
-                        if (sessionPanel.InvokeRequired)
-                        {
-                            this.BeginInvoke((MethodInvoker)delegate()
-                            {
-                                sessionPanel.Close();
-                            });
-                        }
-                        else
-                        {
-                            sessionPanel.Close();
-                        }
-                    }
-                };
-
-                sessionPanel = new ctlPuttyPanel(sessionData, callback);
-                sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
+                CreatePuttyPanel(sessionData);
             }
         }
 
@@ -369,9 +327,9 @@ namespace SuperPutty
                 sessionData.Port = (port != "") ? Convert.ToInt32(port) : 22;
                 sessionData.Username = (username != "") ? username : "";
                 sessionData.Password = (password != "") ? password : "";
-                sessionData.PuttySession = (puttySession != "") ? puttySession : "Default Session";
+                sessionData.PuttySession = (puttySession != "") ? puttySession : "Default Settings";
 
-                if (use_scp)
+                if (use_scp && IsScpEnabled)
                 {
                     CreateRemoteFileListPanel(sessionData);
                 }
@@ -508,6 +466,15 @@ namespace SuperPutty
         {
         	this.m_db = new SuperPutty.Classes.Database();
         	this.m_db.Open();
+        }
+		
+
+        private void HostTextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar == (char)13)
+            {
+                toolStripButton1_Click(sender, e);
+            }
         }
     }
 }
