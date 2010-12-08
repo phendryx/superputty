@@ -265,10 +265,21 @@ namespace SuperPutty
         {
             SessionData sessionData = null;
             bool use_scp = false;
+			bool is_uri = false;
             if (args.Length > 0)
             {
                 sessionData = new SessionData();
                 string proto = "", port = "", username = "", puttySession = "", password = "";
+
+				if (args[0].StartsWith("ssh:"))
+                {
+                    args[0] = args[0].Remove(0, 6);
+                    sessionData.Host = args[0];
+                    sessionData.SessionName = args[0];
+                    is_uri = true;
+                    args[args.Length - 1] = args[args.Length - 1].Remove(args[args.Length - 1].Length - 1, 1);
+                }
+
                 for (int i = 0; i < args.Length - 1; i++)
                 {
                     switch (args[i].ToString().ToLower())
@@ -320,8 +331,11 @@ namespace SuperPutty
                             break;
                     }
                 }
-                sessionData.Host = args[args.Length - 1];
-                sessionData.SessionName = args[args.Length - 1];
+                if (!is_uri)
+                {
+                    sessionData.Host = args[args.Length - 1];
+                    sessionData.SessionName = args[args.Length - 1];
+                }
 
                 sessionData.Proto = (proto != "") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), proto) : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH");
                 sessionData.Port = (port != "") ? Convert.ToInt32(port) : 22;
