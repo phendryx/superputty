@@ -51,10 +51,15 @@ namespace SuperPutty
             if (!onlyInstance)
             {
                 string strArgs = "";
-                foreach(string s in args)
-                {
-                    strArgs += " " + s;
-                }
+				if(args.Length > 0)
+				{
+					strArgs += args[0];
+					
+					for (int i = 1; i < args.Length; i++)
+					{
+						strArgs += " " + args[i];
+					}
+				}
 
                 COPYDATA cd = new COPYDATA();
                 cd.dwData = 0;
