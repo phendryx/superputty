@@ -432,38 +432,49 @@ namespace SuperPutty
         
         void checkForUpdate(bool automatic)
         {
-			string url = "https://github.com/phendryx/superputty/raw/master/VERSION";
-	        string text = "";
-			using (WebClient client = new WebClient())
-	        {
-	            text = client.DownloadString(url);
-	        }
+            try
+            {
+                string url = "https://github.com/phendryx/superputty/raw/master/VERSION";
+                string text = "";
+                using (WebClient client = new WebClient())
+                {
+                    text = client.DownloadString(url);
+                }
 
-			string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
-			
-			string thisVersion = "";
-			object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
-			foreach (object o in attrs)
-			{
-				if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
-				{
-					thisVersion = ((System.Reflection.AssemblyFileVersionAttribute)o).Version;
-				}
-			}
+                string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
 
-			if (thisVersion != version[0])
-			{
-				if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "SuperPutty - New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-					Process.Start(version[1]);
-				}
-			}			
-			else
-			{
-				if (!automatic)
-				{
-					MessageBox.Show("No new version available.", "SuperPutty");
-				}
-			}        	
+                string thisVersion = "";
+                object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
+                foreach (object o in attrs)
+                {
+                    if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
+                    {
+                        thisVersion = ((System.Reflection.AssemblyFileVersionAttribute)o).Version;
+                    }
+                }
+
+                if (thisVersion != version[0])
+                {
+                    if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "SuperPutty - New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                    {
+                        Process.Start(version[1]);
+                    }
+                }
+                else
+                {
+                    if (!automatic)
+                    {
+                        MessageBox.Show("No new version available.", "SuperPutty");
+                    }
+                }
+            }
+            catch (WebException e)
+            {
+                if (!automatic)
+                {
+                    MessageBox.Show("Error while checking for updates: " + e.Message, "SuperPutty");
+                }
+            }
         }
         
         void ToolStripMenuItem4Click(object sender, EventArgs e)
