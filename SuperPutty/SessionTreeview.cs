@@ -32,6 +32,7 @@ using System.Windows.Forms;
 using WeifenLuo.WinFormsUI.Docking;
 using Microsoft.Win32;
 using System.Xml.Serialization;
+using System.Web;
 
 namespace SuperPutty
 {
@@ -102,6 +103,36 @@ namespace SuperPutty
                 }
             }
             return sessionList;
+        }
+
+        /// <summary>
+        /// Copy sessions from PuTTY into SuperPutty Sessions
+        /// </summary>
+        public static void copySessionsFromPuTTY()
+        {
+            RegistryKey key = Registry.CurrentUser.OpenSubKey(@"Software\SimonTatham\PuTTY\Sessions");
+            if (key != null)
+            {
+                string[] savedSessionNames = key.GetSubKeyNames();
+                foreach (string keyName in savedSessionNames)
+                {
+                    RegistryKey sessionKey = key.OpenSubKey(keyName);
+                    if (sessionKey != null)
+                    {
+                        SessionData session = new SessionData();
+                        session.Host = (string)sessionKey.GetValue("HostName", "");
+                        session.Port = (int)sessionKey.GetValue("PortNUmber", 22);
+                        session.Proto = (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol),
+                            ((string)sessionKey.GetValue("Proto", "SSH")).ToUpper());
+                        session.PuttySession = (string)sessionKey.GetValue("PuttySession", HttpUtility.UrlDecode(keyName));
+                        session.SessionName = HttpUtility.UrlDecode(keyName);
+                        session.Username = (string)sessionKey.GetValue("UserName", "");
+                        session.LastDockstate = DockState.Document;
+                        session.AutoStartSession = false;
+                        session.SaveToRegistry();
+                    }
+                }
+            }
         }
 
         /// <summary>

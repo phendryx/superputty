@@ -501,5 +501,14 @@ namespace SuperPutty
                 toolStripButton1_Click(sender, e);
             }
         }
+
+        private void CopyPuttySessionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Do you want to copy all sessions from PuTTY? This may overwrite identically named sessions in SuperPutty!", "SuperPutty", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            {
+                SessionTreeview.copySessionsFromPuTTY();
+                m_Sessions.LoadSessions();
+            }
+        }
     }
 }
