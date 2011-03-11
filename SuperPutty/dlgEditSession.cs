@@ -51,6 +51,9 @@ namespace SuperPutty
                 this.textBoxPort.Text = Session.Port.ToString();
                 this.textBoxUsername.Text = Session.Username;
 
+                if (this.comboBoxPuttyProfile.Items.Contains(session.SessionName))
+                    this.comboBoxPuttyProfile.SelectedItem = session.SessionName;
+
                 switch (Session.Proto)
                 {
                     case ConnectionProtocol.Raw:
