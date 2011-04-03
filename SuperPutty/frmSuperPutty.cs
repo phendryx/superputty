@@ -220,8 +220,9 @@ namespace SuperPutty
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Exit SuperPuTTY?", "Confirm Exit", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+            if (MessageBox.Show("Exit SuperPuTTY?", "Confirm Exit", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) == DialogResult.OK)
             {
+            	this.Close();
                 System.Environment.Exit(0);
             }
         }
