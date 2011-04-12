@@ -128,6 +128,9 @@ namespace SuperPutty
             
             // Check for updates.
             checkForUpdate(true);
+            
+            // Set 'send anonymous stats' menu item check
+            setSendAnonStats();
         }
 
         /// <summary>
@@ -510,6 +513,49 @@ namespace SuperPutty
                 SessionTreeview.copySessionsFromPuTTY();
                 m_Sessions.LoadSessions();
             }
+        }
+        
+        void SendAnonymousStatsToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "send_anonymous_stats";
+			bool val = false;
+			val = bool.Parse(d.GetKey(key));
+			
+			// If the value is true, then set it to false and uncheck menu item,
+			// else, set it to true and check the menu item.
+        	if (val)
+        	{
+        		this.sendAnonymousStatsToolStripMenuItem.Checked = false;
+        		val = false;
+        	}
+        	else
+        	{
+        		this.sendAnonymousStatsToolStripMenuItem.Checked = true;
+        		val = true;
+        	}
+        	
+        	// Update the database
+        	d.SetKey(key, val.ToString());
+        }
+        
+        void FrmSuperPuttyLoad(object sender, EventArgs e)
+        {
+        }
+        
+        private void setSendAnonStats()
+        {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "send_anonymous_stats";
+			bool val = false;
+			val = bool.Parse(d.GetKey(key));
+
+			// Set the checked property
+    		this.sendAnonymousStatsToolStripMenuItem.Checked = val;
         }
     }
 }
