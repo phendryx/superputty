@@ -126,8 +126,16 @@ namespace SuperPutty
              */
             ParseClArguments(args);
             
+            // First time automatic update check
+            firstTimeAutomaticUpdateCheck();
+            
+            // Set automatic update check menu item
+            setAutomaticUpdateCheckMenuItem();
+            
             // Check for updates.
             checkForUpdate(true);
+            
+            
         }
 
         /// <summary>
@@ -433,49 +441,60 @@ namespace SuperPutty
         
         void checkForUpdate(bool automatic)
         {
-            try
-            {
-                string url = "https://github.com/phendryx/superputty/raw/master/VERSION";
-                string text = "";
-                using (WebClient client = new WebClient())
-                {
-                    text = client.DownloadString(url);
-                }
-
-                string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
-
-                string thisVersion = "";
-                object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
-                foreach (object o in attrs)
-                {
-                    if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
-                    {
-                        thisVersion = ((System.Reflection.AssemblyFileVersionAttribute)o).Version;
-                    }
-                }
-
-                if (thisVersion != version[0])
-                {
-                    if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "SuperPutty - New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    {
-                        Process.Start(version[1]);
-                    }
-                }
-                else
-                {
-                    if (!automatic)
-                    {
-                        MessageBox.Show("No new version available.", "SuperPutty");
-                    }
-                }
-            }
-            catch (WebException e)
-            {
-                if (!automatic)
-                {
-                    MessageBox.Show("Error while checking for updates: " + e.Message, "SuperPutty");
-                }
-            }
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "automatic_update_check";
+			bool performCheck = false;
+			performCheck = d.GetKey(key) == "" ? false : bool.Parse(d.GetKey(key));
+        	
+			// Check to see if we should even perform a check
+			if (performCheck && automatic)
+			{
+	            try
+	            {
+	                string url = "https://github.com/phendryx/superputty/raw/master/VERSION";
+	                string text = "";
+	                using (WebClient client = new WebClient())
+	                {
+	                    text = client.DownloadString(url);
+	                }
+	
+	                string[] version = System.Text.RegularExpressions.Regex.Split(text, @"\|");
+	
+	                string thisVersion = "";
+	                object[] attrs = System.Reflection.Assembly.GetEntryAssembly().GetCustomAttributes(true);
+	                foreach (object o in attrs)
+	                {
+	                    if (o.GetType() == typeof(System.Reflection.AssemblyFileVersionAttribute))
+	                    {
+	                        thisVersion = ((System.Reflection.AssemblyFileVersionAttribute)o).Version;
+	                    }
+	                }
+	
+	                if (thisVersion != version[0])
+	                {
+	                    if (MessageBox.Show("There is a new version available. Would you like to open the dicussion page to download it?", "SuperPutty - New version available!", MessageBoxButtons.YesNo) == DialogResult.Yes)
+	                    {
+	                        Process.Start(version[1]);
+	                    }
+	                }
+	                else
+	                {
+	                    if (!automatic)
+	                    {
+	                        MessageBox.Show("No new version available.", "SuperPutty");
+	                    }
+	                }
+	            }
+	            catch (WebException e)
+	            {
+	                if (!automatic)
+	                {
+	                    MessageBox.Show("Error while checking for updates: " + e.Message, "SuperPutty");
+	                }
+	            }
+			}
         }
         
         void ToolStripMenuItem4Click(object sender, EventArgs e)
@@ -514,7 +533,67 @@ namespace SuperPutty
         
         void AutomaticUpdateCheckToolStripMenuItemClick(object sender, EventArgs e)
         {
+         	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "automatic_update_check";
+			bool val = false;
+			val = d.GetKey(key) == "" ? false : bool.Parse(d.GetKey(key));
+			
+			// If the value is true, then set it to false and uncheck menu item,
+			// else, set it to true.
+        	if (val)
+        	{
+        		val = false;
+        	}
+        	else
+        	{
+        		val = true;
+        	}
         	
+        	// Set the menu item check state.
+    		this.automaticUpdateCheckToolStripMenuItem.Checked = val;
+
+        	// Update the database
+        	d.SetKey(key, val.ToString());
         }
+        
+        
+	    private void setAutomaticUpdateCheckMenuItem()
+        {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "automatic_update_check";
+			bool val = false;
+			val = d.GetKey(key) == "" ? false : bool.Parse(d.GetKey(key));
+
+			// Set the checked property
+    		this.automaticUpdateCheckToolStripMenuItem.Checked = val;
+        }
+	    
+	    private void firstTimeAutomaticUpdateCheck()
+	    {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "automatic_update_check";
+			string val = d.GetKey(key);
+
+			// If the value hasnt been set, then the user has not chosen.
+			if (val == "")
+			{
+				bool enabled = false;
+				if (MessageBox.Show("Do you wish to enable automatic update checks?", "SuperPutty", MessageBoxButtons.YesNo) == DialogResult.Yes)
+				{
+					enabled = true;
+				}
+
+				// Store the users decision
+				d.SetKey(key, enabled.ToString());
+
+				MessageBox.Show("You may enable/disable automatic update checks by navigating to the File->Settings menu.", "SuperPutty", MessageBoxButtons.OK);
+			}
+	    }
     }
 }
