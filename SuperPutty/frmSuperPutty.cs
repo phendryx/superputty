@@ -511,5 +511,10 @@ namespace SuperPutty
                 m_Sessions.LoadSessions();
             }
         }
+        
+        void AutomaticUpdateCheckToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	
+        }
     }
 }
