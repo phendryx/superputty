@@ -8,7 +8,7 @@
 Name "${APPNAMEANDVERSION}"
 InstallDir "$PROGRAMFILES\SuperPutty"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "superputty-setup_v1.0.2.exe"
+OutFile "superputty-setup_v1.0.3.exe"
 
 LicenseData "License.txt"
 LicenseText "If you accept the terms of the agreement, click I Agree to continue. You must accept the agreement to install ${APPNAMEANDVERSION}."
