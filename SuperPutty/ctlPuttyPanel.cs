@@ -94,5 +94,30 @@ namespace SuperPutty
         {
             this.applicationwrapper1.ReFocusPuTTY();         
         }
+        
+        void DuplicateSessionToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	MessageBox.Show("Not implemented yet.");
+        }
+        
+        void NewSessionToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	MessageBox.Show("Not implemented yet.");        	
+        }
+        
+        void ClearScrollbackToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	MessageBox.Show("Not implemented yet.");        	
+        }
+        
+        void ResetTerminalToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	MessageBox.Show("Not implemented yet.");        	
+        }
+        
+        void AboutPuttyToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	MessageBox.Show("Not implemented yet.");        	
+        }
     }
 }
