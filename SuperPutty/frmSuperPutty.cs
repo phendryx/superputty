@@ -318,7 +318,7 @@ namespace SuperPutty
                             proto = "Rlogin";
                             break;
 
-                        case "-P":
+                        case "-p":
                             port = args[i + 1];
                             i++;
                             break;
