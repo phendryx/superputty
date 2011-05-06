@@ -39,6 +39,7 @@ namespace SuperPutty
     public partial class SessionTreeview : ToolWindow
     {
         private DockPanel m_DockPanel;
+        private frmSuperPutty m_SuperPutty;
 
         /// <summary>
         /// Instantiate the treeview containing the sessions
@@ -46,9 +47,10 @@ namespace SuperPutty
         /// <param name="dockPanel">The DockPanel container</param>
         /// <remarks>Having the dockpanel container is necessary to allow us to
         /// dock any terminal or file transfer sessions from within the treeview class</remarks>
-        public SessionTreeview(DockPanel dockPanel)
+        public SessionTreeview(frmSuperPutty superPutty, DockPanel dockPanel)
         {
             m_DockPanel = dockPanel;
+            m_SuperPutty = superPutty;
             InitializeComponent();
 
             // disable file transfers if pscp isn't configured.
@@ -175,39 +177,7 @@ namespace SuperPutty
             if (treeView1.SelectedNode.ImageIndex > 0)
             {
                 SessionData sessionData = (SessionData)treeView1.SelectedNode.Tag;
-                ctlPuttyPanel sessionPanel = null;
-
-                // This is the callback fired when the panel containing the terminal is closed
-                // We use this to save the last docking location
-                PuttyClosedCallback callback = delegate(bool closed)
-                {
-                    if (sessionPanel != null)
-                    {
-                        // save the last dockstate (if it has been changed)
-                        if (sessionData.LastDockstate != sessionPanel.DockState
-                            && sessionPanel.DockState != DockState.Unknown
-                            && sessionPanel.DockState != DockState.Hidden)
-                        {
-                            sessionData.LastDockstate = sessionPanel.DockState;
-                            sessionData.SaveToRegistry();
-                        }
-
-                        if (sessionPanel.InvokeRequired)
-                        {
-                            this.BeginInvoke((MethodInvoker)delegate()
-                            {
-                                sessionPanel.Close();
-                            });
-                        }
-                        else
-                        {
-                            sessionPanel.Close();
-                        }
-                    }
-                };
-
-                sessionPanel = new ctlPuttyPanel(sessionData, callback);
-                sessionPanel.Show(m_DockPanel, sessionData.LastDockstate);
+                m_SuperPutty.CreatePuttyPanel(sessionData);
             }
         }
 

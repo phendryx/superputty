@@ -126,6 +126,18 @@ namespace SuperPutty
             Proto = protocol;
             PuttySession = sessionConfig;
         }
+
+        public SessionData(SessionData data)
+        {
+            SessionName = data.SessionName;
+            Host = data.Host;
+            Port = data.Port;
+            Proto = data.Proto;
+            PuttySession = data.PuttySession;
+            Username = data.Username;
+            LastDockstate = data.LastDockstate;
+            AutoStartSession = data.AutoStartSession;
+        }
         
         public SessionData()
         {

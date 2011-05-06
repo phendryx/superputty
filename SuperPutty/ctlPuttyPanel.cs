@@ -38,14 +38,16 @@ namespace SuperPutty
         private ApplicationPanel applicationwrapper1;
         private SessionData m_Session;
         private PuttyClosedCallback m_ApplicationExit;
+        private frmSuperPutty m_SuperPutty;
 
         public string ApplicationTitle
         {
         	get { return this.applicationwrapper1.ApplicationWindowTitle; }
         }
 
-        public ctlPuttyPanel(SessionData session, PuttyClosedCallback callback)
+        public ctlPuttyPanel(frmSuperPutty superPutty, SessionData session, PuttyClosedCallback callback)
         {
+            m_SuperPutty = superPutty;
             m_Session = session;
             m_ApplicationExit = callback;
 
@@ -87,6 +89,12 @@ namespace SuperPutty
             this.Close();
         }
 
+        private void duplicateSessionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SessionData sessionData = new SessionData(m_Session);
+            m_SuperPutty.CreatePuttyPanel(sessionData);
+        }
+
         /// <summary>
         /// Reset the focus to the child application window
         /// </summary>
@@ -94,5 +102,6 @@ namespace SuperPutty
         {
             this.applicationwrapper1.ReFocusPuTTY();         
         }
+
     }
 }

@@ -56,7 +56,7 @@
             this.aboutPuttyToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.ShowImageMargin = false;
-            this.contextMenuStrip1.Size = new System.Drawing.Size(142, 154);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(142, 176);
             // 
             // newSessionToolStripMenuItem
             // 
@@ -69,6 +69,7 @@
             this.duplicateSessionToolStripMenuItem.Name = "duplicateSessionToolStripMenuItem";
             this.duplicateSessionToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
             this.duplicateSessionToolStripMenuItem.Text = "Duplicate Session";
+            this.duplicateSessionToolStripMenuItem.Click += new System.EventHandler(this.duplicateSessionToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
