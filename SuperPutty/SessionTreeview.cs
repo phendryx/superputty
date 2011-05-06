@@ -123,7 +123,7 @@ namespace SuperPutty
                         session.Host = (string)sessionKey.GetValue("HostName", "");
                         session.Port = (int)sessionKey.GetValue("PortNUmber", 22);
                         session.Proto = (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol),
-                            ((string)sessionKey.GetValue("Proto", "SSH")).ToUpper());
+                            (string)sessionKey.GetValue("Protocol", "SSH"), true);
                         session.PuttySession = (string)sessionKey.GetValue("PuttySession", HttpUtility.UrlDecode(keyName));
                         session.SessionName = HttpUtility.UrlDecode(keyName);
                         session.Username = (string)sessionKey.GetValue("UserName", "");
