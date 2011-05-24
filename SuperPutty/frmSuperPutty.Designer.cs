@@ -48,12 +48,15 @@
         	this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.puTTYScpLocationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+        	this.automaticUpdateCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
         	this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
         	this.importSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.CopyPuttySessionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
         	this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+        	this.windowToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+        	this.toolbarViewSessions = new System.Windows.Forms.ToolStripMenuItem();
         	this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.puTTYConfigurationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -77,7 +80,6 @@
         	this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
         	this.PasswordTextBox = new System.Windows.Forms.ToolStripTextBox();
         	this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-        	this.automaticUpdateCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
         	this.menuStrip1.SuspendLayout();
         	this.toolStripContainer1.ContentPanel.SuspendLayout();
         	this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -90,6 +92,7 @@
         	this.menuStrip1.Dock = System.Windows.Forms.DockStyle.None;
         	this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
         	        	        	this.fileToolStripMenuItem,
+        	        	        	this.windowToolStripMenuItem,
         	        	        	this.toolsToolStripMenuItem,
         	        	        	this.helpToolStripMenuItem});
         	this.menuStrip1.Location = new System.Drawing.Point(0, 0);
@@ -128,6 +131,13 @@
         	this.puTTYScpLocationToolStripMenuItem.Text = "PuTTY/Scp Location";
         	this.puTTYScpLocationToolStripMenuItem.Click += new System.EventHandler(this.puTTYScpLocationToolStripMenuItem_Click);
         	// 
+        	// automaticUpdateCheckToolStripMenuItem
+        	// 
+        	this.automaticUpdateCheckToolStripMenuItem.Name = "automaticUpdateCheckToolStripMenuItem";
+        	this.automaticUpdateCheckToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
+        	this.automaticUpdateCheckToolStripMenuItem.Text = "Automatic Update Check";
+        	this.automaticUpdateCheckToolStripMenuItem.Click += new System.EventHandler(this.AutomaticUpdateCheckToolStripMenuItemClick);
+        	// 
         	// toolStripSeparator2
         	// 
         	this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -165,6 +175,22 @@
         	this.toolStripMenuItem2.Size = new System.Drawing.Size(187, 22);
         	this.toolStripMenuItem2.Text = "Exit";
         	this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
+        	// 
+        	// windowToolStripMenuItem
+        	// 
+        	this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+        	        	        	this.toolbarViewSessions});
+        	this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
+        	this.windowToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+        	this.windowToolStripMenuItem.Text = "View";
+        	this.windowToolStripMenuItem.Click += new System.EventHandler(this.WindowToolStripMenuItemClick);
+        	// 
+        	// toolbarViewSessions
+        	// 
+        	this.toolbarViewSessions.Name = "toolbarViewSessions";
+        	this.toolbarViewSessions.Size = new System.Drawing.Size(152, 22);
+        	this.toolbarViewSessions.Text = "Sessions";
+        	this.toolbarViewSessions.Click += new System.EventHandler(this.ToolbarViewSessionsClick);
         	// 
         	// toolsToolStripMenuItem
         	// 
@@ -413,13 +439,6 @@
         	this.toolStripButton1.Text = "Connect";
         	this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
         	// 
-        	// automaticUpdateCheckToolStripMenuItem
-        	// 
-        	this.automaticUpdateCheckToolStripMenuItem.Name = "automaticUpdateCheckToolStripMenuItem";
-        	this.automaticUpdateCheckToolStripMenuItem.Size = new System.Drawing.Size(203, 22);
-        	this.automaticUpdateCheckToolStripMenuItem.Text = "Automatic Update Check";
-        	this.automaticUpdateCheckToolStripMenuItem.Click += new System.EventHandler(this.AutomaticUpdateCheckToolStripMenuItemClick);
-        	// 
         	// frmSuperPutty
         	// 
         	this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -443,6 +462,8 @@
         	this.ConnectToolStrip.PerformLayout();
         	this.ResumeLayout(false);
         }
+        private System.Windows.Forms.ToolStripMenuItem toolbarViewSessions;
+        private System.Windows.Forms.ToolStripMenuItem windowToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem automaticUpdateCheckToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem4;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem3;

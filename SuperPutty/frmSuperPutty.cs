@@ -59,6 +59,7 @@ namespace SuperPutty
         }
 
         private SessionTreeview m_Sessions;
+    
 		private Classes.Database m_db;
 		
         public frmSuperPutty(string[] args)
@@ -118,9 +119,8 @@ namespace SuperPutty
             /* 
              * Open the session treeview and dock it on the right
              */
-            m_Sessions = new SessionTreeview(this, dockPanel1);
-            m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
-
+            showSessionTreeview();
+            
             /*
              * Parsing CL Arguments
              */
@@ -595,5 +595,23 @@ namespace SuperPutty
 				MessageBox.Show("You may enable/disable automatic update checks by navigating to the File->Settings menu.", "SuperPutty", MessageBoxButtons.OK);
 			}
 	    }
+        
+        void WindowToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        }
+        
+        private void showSessionTreeview()
+        {
+            m_Sessions = new SessionTreeview(this, dockPanel1);
+            m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
+        }
+        
+        void ToolbarViewSessionsClick(object sender, EventArgs e)
+        {
+        	if (m_Sessions.Visible == false)
+        	{
+        		showSessionTreeview();
+        	}
+        }
     }
 }

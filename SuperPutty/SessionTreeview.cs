@@ -292,5 +292,9 @@ namespace SuperPutty
         }
 
 
+        
+        void SessionTreeviewFormClosed(object sender, FormClosedEventArgs e)
+        {
+        }
     }
 }
