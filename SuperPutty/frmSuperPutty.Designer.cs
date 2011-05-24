@@ -188,7 +188,7 @@
         	// toolbarViewSessions
         	// 
         	this.toolbarViewSessions.Name = "toolbarViewSessions";
-        	this.toolbarViewSessions.Size = new System.Drawing.Size(152, 22);
+        	this.toolbarViewSessions.Size = new System.Drawing.Size(126, 22);
         	this.toolbarViewSessions.Text = "Sessions";
         	this.toolbarViewSessions.Click += new System.EventHandler(this.ToolbarViewSessionsClick);
         	// 
