@@ -118,7 +118,7 @@ namespace SuperPutty
             /* 
              * Open the session treeview and dock it on the right
              */
-            m_Sessions = new SessionTreeview(dockPanel1);
+            m_Sessions = new SessionTreeview(this, dockPanel1);
             m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
 
             /*
@@ -396,7 +396,7 @@ namespace SuperPutty
                 }
             };
 
-            sessionPanel = new ctlPuttyPanel(sessionData, callback);
+            sessionPanel = new ctlPuttyPanel(this, sessionData, callback);
             sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
         }
 
