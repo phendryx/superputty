@@ -59,6 +59,7 @@ namespace SuperPutty
         }
 
         private SessionTreeview m_Sessions;
+    
 		private Classes.Database m_db;
 		
         public frmSuperPutty(string[] args)
@@ -118,9 +119,8 @@ namespace SuperPutty
             /* 
              * Open the session treeview and dock it on the right
              */
-            m_Sessions = new SessionTreeview(this, dockPanel1);
-            m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
-
+            showSessionTreeview();
+            
             /*
              * Parsing CL Arguments
              */
@@ -250,26 +250,33 @@ namespace SuperPutty
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            SessionData sessionData = new SessionData();
-
-            sessionData.Host = HostTextBox.Text;
-            sessionData.Port = Convert.ToInt32(PortTextBox.Text);
-            sessionData.Proto = (ProtocolBox.Text == "SCP") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH") : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), ProtocolBox.Text);
-            sessionData.PuttySession = "Default Settings";
-            sessionData.SessionName = HostTextBox.Text;
-            sessionData.Username = LoginTextBox.Text;
-			sessionData.Password = PasswordTextBox.Text;
-
-            if (ProtocolBox.Text == "SCP" && IsScpEnabled)
-            {
-				CreateRemoteFileListPanel(sessionData);
-            }
-            else
-            {
-                CreatePuttyPanel(sessionData);
-            }
+        	if (this.HostTextBox.Text == "")
+        	{
+        		MessageBox.Show("You must enter a host ip or name to connect.", "SuperPutty", MessageBoxButtons.OK);
+        	}
+        	else
+        	{
+	            SessionData sessionData = new SessionData();
+	
+	            sessionData.Host = HostTextBox.Text;
+	            sessionData.Port = Convert.ToInt32(PortTextBox.Text);
+	            sessionData.Proto = (ProtocolBox.Text == "SCP") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH") : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), ProtocolBox.Text);
+	            sessionData.PuttySession = "Default Settings";
+	            sessionData.SessionName = HostTextBox.Text;
+	            sessionData.Username = LoginTextBox.Text;
+				sessionData.Password = PasswordTextBox.Text;
+	
+	            if (ProtocolBox.Text == "SCP" && IsScpEnabled)
+	            {
+					CreateRemoteFileListPanel(sessionData);
+	            }
+	            else
+	            {
+	                CreatePuttyPanel(sessionData);
+	            }
+	        }
         }
-
+        
         public void ParseClArguments(string[] args)
         {
             SessionData sessionData = null;
@@ -595,5 +602,23 @@ namespace SuperPutty
 				MessageBox.Show("You may enable/disable automatic update checks by navigating to the File->Settings menu.", "SuperPutty", MessageBoxButtons.OK);
 			}
 	    }
+        
+        void WindowToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        }
+        
+        private void showSessionTreeview()
+        {
+            m_Sessions = new SessionTreeview(this, dockPanel1);
+            m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
+        }
+        
+        void ToolbarViewSessionsClick(object sender, EventArgs e)
+        {
+        	if (m_Sessions.Visible == false)
+        	{
+        		showSessionTreeview();
+        	}
+        }
     }
 }
