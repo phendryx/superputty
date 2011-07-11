@@ -279,95 +279,23 @@ namespace SuperPutty
         
         public void ParseClArguments(string[] args)
         {
-            SessionData sessionData = null;
-            bool use_scp = false;
-			bool is_uri = false;
-            if (args.Length > 0)
+        	Object o = Classes.CLI.ParseCLIArguments(args);
+        	SessionData sessionData = Classes.CLI.ParseCLIArguments(args);
+        	int woot = 0;
+/*
+        	SessionData sessionData = null;
+        	
+			sessionData = Classes.CLI.ParseCLIArguments(args);
+
+            if (sessionData.UseSCP && IsScpEnabled)
             {
-                sessionData = new SessionData();
-                string proto = "", port = "", username = "", puttySession = "", password = "";
-
-				if (args[0].StartsWith("ssh:"))
-                {
-                    args[0] = args[0].Remove(0, 6);
-                    sessionData.Host = args[0];
-                    sessionData.SessionName = args[0];
-                    is_uri = true;
-                    args[args.Length - 1] = args[args.Length - 1].Remove(args[args.Length - 1].Length - 1, 1);
-                }
-
-                for (int i = 0; i < args.Length - 1; i++)
-                {
-                    switch (args[i].ToString().ToLower())
-                    {
-                        case "-ssh":
-                            proto = "SSH";
-                            break;
-
-                        case "-serial":
-                            proto = "Serial";
-                            break;
-
-                        case "-telnet":
-                            proto = "Telnet";
-                            break;
-
-                        case "-scp":
-                            proto = "SSH";
-                            use_scp = true;
-                            break;
-
-                        case "-raw":
-                            proto = "Raw";
-                            break;
-
-                        case "-rlogin":
-                            proto = "Rlogin";
-                            break;
-
-                        case "-p":
-                            port = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-l":
-                            username = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-pw":
-                            password = args[i + 1];
-                            i++;
-                            break;
-
-                        case "-load":
-                            puttySession = args[i + 1];
-                            sessionData.PuttySession = args[i + 1];
-                            i++;
-                            break;
-                    }
-                }
-                if (!is_uri)
-                {
-                    sessionData.Host = args[args.Length - 1];
-                    sessionData.SessionName = args[args.Length - 1];
-                }
-
-                sessionData.Proto = (proto != "") ? (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), proto) : (ConnectionProtocol)Enum.Parse(typeof(ConnectionProtocol), "SSH");
-                sessionData.Port = (port != "") ? Convert.ToInt32(port) : 22;
-                sessionData.Username = (username != "") ? username : "";
-                sessionData.Password = (password != "") ? password : "";
-                sessionData.PuttySession = (puttySession != "") ? puttySession : "Default Settings";
-
-                if (use_scp && IsScpEnabled)
-                {
-                    CreateRemoteFileListPanel(sessionData);
-                }
-                else
-                {
-                    CreatePuttyPanel(sessionData);
-                }
+                CreateRemoteFileListPanel(sessionData);
             }
+            else
+            {
+                CreatePuttyPanel(sessionData);
+            }
+*/
         }
 
         public void CreatePuttyPanel(SessionData sessionData)

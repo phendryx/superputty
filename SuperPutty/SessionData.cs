@@ -118,6 +118,12 @@ namespace SuperPutty
             set { m_AutoStartSession = value; }
         }
 
+        private bool m_UseSCP = false;
+        public bool UseSCP
+        {
+        	get { return this.m_UseSCP;}
+        	set { m_UseSCP = value; }
+        }
         public SessionData(string sessionName, string hostName, int port, ConnectionProtocol protocol, string sessionConfig)
         {
             SessionName = sessionName;

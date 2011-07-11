@@ -47,6 +47,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NUnit.Framework">
+      <HintPath>$(SharpDevelopBinPath)\Tools\NUnit\NUnit.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data.SQLite">
       <HintPath>..\bin\System.Data.SQLite.DLL</HintPath>
@@ -70,6 +73,7 @@
     <Compile Include="AboutBox1.Designer.cs">
       <DependentUpon>AboutBox1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\CLI.cs" />
     <Compile Include="Classes\Database.cs" />
     <Compile Include="ctlApplicationPanel.cs">
       <SubType>Component</SubType>
@@ -101,6 +105,7 @@
       <DependentUpon>frmTransferStatus.cs</DependentUpon>
     </Compile>
     <Compile Include="Logger.cs" />
+    <Compile Include="nUnit\CLI.cs" />
     <Compile Include="RemoteFileListPanel.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -195,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Classes" />
+    <Folder Include="nUnit" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
