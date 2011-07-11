@@ -27,6 +27,47 @@ namespace SuperPutty.Classes
 		{
 		}
 
+		#region Static Methods
+		public static GetBooleanKey(string key, bool defaultValue)
+		{
+			bool value = defaultValue;
+			
+			Database d = new Database();
+			d.Open();
+			
+			string value = d.GetKey(key);
+			value = bool.Parse(value);
+			
+			return value;
+		}
+
+		public static GetIntegerKey(string key, int defaultValue)
+		{
+			int value = defaultValue;
+			
+			Database d = new Database();
+			d.Open();
+			
+			string value = d.GetKey(key);
+			value = int.Parse(value);
+			
+			return value;
+		}
+
+		public static GetStringKey(string key, string defaultValue)
+		{
+			string value = defaultValue;
+			
+			Database d = new Database();
+			d.Open();
+			
+			string value = d.GetKey(key);
+
+			return value;
+		}
+		#endregion
+
+		#region Dynamic Methods
 		public SQLiteConnection Open()
 		{
         	string db_filename = Application.StartupPath + "\\SuperPutty.db3";
@@ -44,35 +85,18 @@ namespace SuperPutty.Classes
         	return _conn;
 		}
 		
-		public static string GetKeyStatic(string key)
+		public DataTable FillDataTable(string sql)
 		{
-        	string db_filename = Application.StartupPath + "\\SuperPutty.db3";
-        	if (!File.Exists(db_filename))
-        	{
-        		SQLiteConnection.CreateFile(db_filename);
-        	}
-        	
-        	string connection_string = "Data Source=" + db_filename + ";Version=3;";
-        	SQLiteConnection _conn = new System.Data.SQLite.SQLiteConnection(connection_string);
-        	_conn.Open();
-        	
+			DataTable dt = new DataTable();
+			
 			SQLiteCommand cmd = new SQLiteCommand("select value from settings where key = '" + key + "';", _conn);
 			SQLiteDataAdapter da = new SQLiteDataAdapter(cmd);
 			DataTable dt = new DataTable();
 			da.Fill(dt);
-			string value = "";
-			if (dt.Rows.Count == 1)
-			{
-				value = (string)dt.Rows[0][0];
-			}
-
-			_conn.Close();
-			_conn.Dispose();
-			
-			return value;
-			
-		}
 		
+			return dt;
+		}
+
 		public string GetKey(string key)
 		{
 			SQLiteCommand cmd = new SQLiteCommand("select value from settings where key = '" + key + "';", _conn);
@@ -88,37 +112,6 @@ namespace SuperPutty.Classes
 			return value;
 		}
 		
-		public static void SetKeyStatic(string key, string value)
-		{
-        	string db_filename = Application.StartupPath + "\\SuperPutty.db3";
-        	if (!File.Exists(db_filename))
-        	{
-        		SQLiteConnection.CreateFile(db_filename);
-        	}
-        	
-        	string connection_string = "Data Source=" + db_filename + ";Version=3;";
-        	SQLiteConnection _conn = new System.Data.SQLite.SQLiteConnection(connection_string);
-        	_conn.Open();
-
-        	SQLiteCommand cmd = new SQLiteCommand("select id from settings where key = '" + key + "'", _conn);
-			SQLiteDataAdapter da = new SQLiteDataAdapter(cmd);
-			DataTable dt = new DataTable();
-			da.Fill(dt);
-
-			if (dt.Rows.Count == 0)
-			{
-				cmd.CommandText = "insert into settings (key, value) values ('" + key + "', '" + value + "')";
-			}
-			else
-			{
-				cmd.CommandText = "update settings set value = '" + value + "' where key = '" + key + "'";
-			}
-			cmd.ExecuteNonQuery();	
-			
-			_conn.Close();
-			_conn.Dispose();
-		}
-
 		public void SetKey(string key, string value)
 		{
 			SQLiteCommand cmd = new SQLiteCommand("select id from settings where key = '" + key + "'", _conn);
@@ -184,7 +177,7 @@ namespace SuperPutty.Classes
 					SetKey("pscp_exe", pscpExe);
                 }
             }
-
 		}
+		#endregion
 	}
 }
