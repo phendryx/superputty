@@ -279,25 +279,21 @@ namespace SuperPutty
         
         public void ParseClArguments(string[] args)
         {
-        	Object o = Classes.CLI.ParseCLIArguments(args);
-        	SessionData sessionData = Classes.CLI.ParseCLIArguments(args);
-        	int woot = 0;
-/*
-        	SessionData sessionData = null;
-        	
-			sessionData = Classes.CLI.ParseCLIArguments(args);
-
-            if (sessionData.UseSCP && IsScpEnabled)
-            {
-                CreateRemoteFileListPanel(sessionData);
-            }
-            else
-            {
-                CreatePuttyPanel(sessionData);
-            }
-*/
+        	if (args.Length > 0)
+        	{
+	        	SessionData sessionData = Classes.CLI.ParseCLIArguments(args);
+	
+	            if (sessionData.UseSCP && IsScpEnabled)
+	            {
+	                CreateRemoteFileListPanel(sessionData);
+	            }
+	            else
+	            {
+	                CreatePuttyPanel(sessionData);
+	            }
+			}
         }
-
+        
         public void CreatePuttyPanel(SessionData sessionData)
         {
             ctlPuttyPanel sessionPanel = null;
