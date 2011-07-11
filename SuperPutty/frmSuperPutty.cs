@@ -135,7 +135,8 @@ namespace SuperPutty
             // Check for updates.
             checkForUpdate(true);
             
-            
+            // Set window state and size
+            setWindowStateAndSize();
         }
 
         /// <summary>
@@ -230,6 +231,10 @@ namespace SuperPutty
         {
             if (MessageBox.Show("Exit SuperPuTTY?", "Confirm Exit", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) == DialogResult.OK)
             {
+				Classes.Database.SetKeyStatic("main_form_state", this.WindowState.ToString());
+				Classes.Database.SetKeyStatic("main_form_height", this.Height.ToString());
+				Classes.Database.SetKeyStatic("main_form_width", this.Width.ToString());                              
+
             	this.Close();
                 System.Environment.Exit(0);
             }
@@ -543,6 +548,26 @@ namespace SuperPutty
         	{
         		showSessionTreeview();
         	}
+        }
+        
+        
+        
+        void FrmSuperPuttySizeChanged(object sender, EventArgs e)
+        {
+        }
+        
+        private void setWindowStateAndSize()
+        {
+        	//this.WindowState = FormWindowState.Parse(FormWindowState, Classes.Database.GetStringKey("main_form_state", ""));
+        	this.Height = Classes.Database.GetIntegerKey("main_form_height", 600);
+        	this.Width = Classes.Database.GetIntegerKey("main_form_width", 800);
+        }
+        
+        void FrmSuperPuttyFormClosing(object sender, FormClosingEventArgs e)
+        {
+			Classes.Database.SetKeyStatic("main_form_state", this.WindowState.ToString());
+			Classes.Database.SetKeyStatic("main_form_height", this.Height.ToString());
+			Classes.Database.SetKeyStatic("main_form_width", this.Width.ToString());                              
         }
     }
 }

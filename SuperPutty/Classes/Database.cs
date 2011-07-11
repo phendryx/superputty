@@ -28,42 +28,56 @@ namespace SuperPutty.Classes
 		}
 
 		#region Static Methods
-		public static GetBooleanKey(string key, bool defaultValue)
+		public static Boolean GetBooleanKey(string key, bool defaultValue)
 		{
 			bool value = defaultValue;
 			
 			Database d = new Database();
 			d.Open();
 			
-			string value = d.GetKey(key);
-			value = bool.Parse(value);
+			string v = d.GetKey(key);
+			if (v != "")
+			{
+				value = bool.Parse(v);
+			}
 			
 			return value;
 		}
 
-		public static GetIntegerKey(string key, int defaultValue)
+		public static int GetIntegerKey(string key, int defaultValue)
 		{
 			int value = defaultValue;
 			
 			Database d = new Database();
 			d.Open();
 			
-			string value = d.GetKey(key);
-			value = int.Parse(value);
+			string v = d.GetKey(key);
+			if (v != "")
+			{
+				value = int.Parse(v);
+			}
 			
 			return value;
 		}
 
-		public static GetStringKey(string key, string defaultValue)
+		public static string GetStringKey(string key, string defaultValue)
 		{
 			string value = defaultValue;
 			
 			Database d = new Database();
 			d.Open();
 			
-			string value = d.GetKey(key);
+			value = d.GetKey(key);
 
 			return value;
+		}
+		
+		public static void SetKeyStatic(string key, string value)
+		{
+			Database d = new Database();
+			d.Open();
+			
+			d.SetKey(key, value);
 		}
 		#endregion
 
@@ -89,9 +103,8 @@ namespace SuperPutty.Classes
 		{
 			DataTable dt = new DataTable();
 			
-			SQLiteCommand cmd = new SQLiteCommand("select value from settings where key = '" + key + "';", _conn);
+			SQLiteCommand cmd = new SQLiteCommand(sql);
 			SQLiteDataAdapter da = new SQLiteDataAdapter(cmd);
-			DataTable dt = new DataTable();
 			da.Fill(dt);
 		
 			return dt;

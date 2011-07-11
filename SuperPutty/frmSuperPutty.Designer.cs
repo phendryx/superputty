@@ -450,7 +450,9 @@
         	this.Name = "frmSuperPutty";
         	this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
         	this.Text = "SuperPuTTY";
+        	this.SizeChanged += new System.EventHandler(this.FrmSuperPuttySizeChanged);
         	this.Activated += new System.EventHandler(this.frmSuperPutty_Activated);
+        	this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrmSuperPuttyFormClosing);
         	this.menuStrip1.ResumeLayout(false);
         	this.menuStrip1.PerformLayout();
         	this.toolStripContainer1.ContentPanel.ResumeLayout(false);
