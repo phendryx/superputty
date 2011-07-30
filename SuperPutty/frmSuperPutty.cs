@@ -119,8 +119,11 @@ namespace SuperPutty
             /* 
              * Open the session treeview and dock it on the right
              */
-            showSessionTreeview();
-            
+            m_Sessions = new SessionTreeview(this, dockPanel1);
+            if(Classes.Database.GetBooleanKey("ShowSessionTreeview", true))
+            {
+            	showSessionTreeview();
+            }
             /*
              * Parsing CL Arguments
              */
@@ -550,6 +553,9 @@ namespace SuperPutty
         	if (m_Sessions.Visible == false)
         	{
         		showSessionTreeview();
+        		Classes.Database d = new SuperPutty.Classes.Database();
+        		d.Open();
+        		d.SetKey("ShowSessionTreeview", "true");
         	}
         }
         
