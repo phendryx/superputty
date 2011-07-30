@@ -1212,7 +1212,7 @@ namespace SuperPutty
                     // Additional timing
                     if(Classes.Database.GetBooleanKey("additional_timing", false))
                     {
-                    	System.Threading.Thread.Sleep(2000);
+                    	System.Threading.Thread.Sleep(200);
                     }
                     
                     m_AppWin = m_Process.MainWindowHandle;                   
