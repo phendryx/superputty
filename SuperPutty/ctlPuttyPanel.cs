@@ -103,5 +103,12 @@ namespace SuperPutty
             this.applicationwrapper1.ReFocusPuTTY();         
         }
 
+        
+        void RestartSessionToolStripMenuItemClick(object sender, EventArgs e)
+        {
+        	SessionData sessionData = new SessionData(m_Session);
+            m_SuperPutty.CreatePuttyPanel(sessionData);
+            this.Close();
+        }
     }
 }
