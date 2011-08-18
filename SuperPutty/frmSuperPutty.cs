@@ -119,8 +119,11 @@ namespace SuperPutty
             /* 
              * Open the session treeview and dock it on the right
              */
-            showSessionTreeview();
-            
+            m_Sessions = new SessionTreeview(this, dockPanel1);
+            if(Classes.Database.GetBooleanKey("ShowSessionTreeview", true))
+            {
+            	showSessionTreeview();
+            }
             /*
              * Parsing CL Arguments
              */
@@ -131,6 +134,9 @@ namespace SuperPutty
             
             // Set automatic update check menu item
             setAutomaticUpdateCheckMenuItem();
+            
+            // Set addtional timing menu item
+            setAdditionalTimingMenuItem();
             
             // Check for updates.
             checkForUpdate(true);
@@ -547,6 +553,9 @@ namespace SuperPutty
         	if (m_Sessions.Visible == false)
         	{
         		showSessionTreeview();
+        		Classes.Database d = new SuperPutty.Classes.Database();
+        		d.Open();
+        		d.SetKey("ShowSessionTreeview", "true");
         	}
         }
         
@@ -568,6 +577,46 @@ namespace SuperPutty
 			Classes.Database.SetKeyStatic("main_form_state", this.WindowState.ToString());
 			Classes.Database.SetKeyStatic("main_form_height", this.Height.ToString());
 			Classes.Database.SetKeyStatic("main_form_width", this.Width.ToString());                              
+        }
+        
+        void AdditionalTimingClick(object sender, EventArgs e)
+        {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "additional_timing";
+			bool val = false;
+			val = d.GetKey(key) == "" ? false : bool.Parse(d.GetKey(key));
+			
+			// If the value is true, then set it to false and uncheck menu item,
+			// else, set it to true.
+        	if (val)
+        	{
+        		val = false;
+        	}
+        	else
+        	{
+        		val = true;
+        	}
+        	
+        	// Set the menu item check state.
+        	this.additionalTiming.Checked = val;
+
+        	// Update the database
+        	d.SetKey(key, val.ToString());
+        }
+        
+        private void setAdditionalTimingMenuItem()
+        {
+        	// Get the current value from the database
+        	Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+			string key = "additional_timing";
+			bool val = false;
+			val = d.GetKey(key) == "" ? false : bool.Parse(d.GetKey(key));
+
+			// Set the checked property
+			this.additionalTiming.Checked = val;
         }
     }
 }

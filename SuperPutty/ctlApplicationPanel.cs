@@ -1207,7 +1207,14 @@ namespace SuperPutty
                     m_Process.Start();
 
                     // Wait for application to start and become idle
-                    m_Process.WaitForInputIdle();                    
+                    m_Process.WaitForInputIdle();
+                    
+                    // Additional timing
+                    if(Classes.Database.GetBooleanKey("additional_timing", false))
+                    {
+                    	System.Threading.Thread.Sleep(200);
+                    }
+                    
                     m_AppWin = m_Process.MainWindowHandle;                   
                 }
                 catch (InvalidOperationException ex)
