@@ -141,6 +141,7 @@ namespace SuperPutty
             Proto = data.Proto;
             PuttySession = data.PuttySession;
             Username = data.Username;
+            Password = data.Password;
             LastDockstate = data.LastDockstate;
             AutoStartSession = data.AutoStartSession;
         }

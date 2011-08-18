@@ -79,16 +79,16 @@ namespace SuperPutty
             {
             
 #if DEBUG
-            Logger.OnLog += delegate(string logMessage)
-            {
-                Console.WriteLine(logMessage);
-            };
+            	Logger.OnLog += delegate(string logMessage)
+           		{
+                	Console.WriteLine(logMessage);
+            	};
 #endif
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmSuperPutty(args));
-
+            	Application.EnableVisualStyles();
+            	Application.SetCompatibleTextRenderingDefault(false);
+            	Application.Run(new frmSuperPutty(args));
+            	GC.KeepAlive(mutex);
             }
         }
     }
