@@ -25,6 +25,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading;
+using System.Collections;
 
 namespace SuperPutty
 {
@@ -82,6 +83,7 @@ namespace SuperPutty
             	Logger.OnLog += delegate(string logMessage)
            		{
                 	Console.WriteLine(logMessage);
+                	System.Console.WriteLine("Your file has been logged")
             	};
 #endif
 
