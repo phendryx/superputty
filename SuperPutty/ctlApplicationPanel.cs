@@ -1284,7 +1284,7 @@ namespace SuperPutty
             {
                 PostMessage(m_AppWin, WM_CLOSE, 0, 0);
 
-                //System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(100);
 
                 m_AppWin = IntPtr.Zero;
             }
