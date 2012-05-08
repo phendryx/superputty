@@ -168,7 +168,7 @@
             // newMintty
             // 
             this.newMintty.Name = "newMintty";
-            this.newMintty.Size = new System.Drawing.Size(152, 22);
+            this.newMintty.Size = new System.Drawing.Size(109, 22);
             this.newMintty.Text = "mintty";
             this.newMintty.Click += new System.EventHandler(this.newMintty_Click);
             // 

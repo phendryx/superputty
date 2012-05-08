@@ -92,6 +92,7 @@ namespace SuperPutty
             this.ResumeLayout();
         }
 
+        // TODO: Still need to remove the child when it is closed
         private void applicationwrapper1_VisibleChanged(object sender, EventArgs e)
         {
             m_SuperPutty.AddChild(this.applicationwrapper1.GetChildHandle());

@@ -75,7 +75,6 @@ namespace SuperPutty
 
         private Dictionary<IntPtr, bool> children;
         GlobalHotkeys m_hotkeys;
-        short hotkey;
 		
         public frmSuperPutty(string[] args)
         {
@@ -162,12 +161,6 @@ namespace SuperPutty
             setWindowStateAndSize();
 
             registerHotkeys();
-        }
-
-        private void registerHotkeys()
-        {
-            m_hotkeys = new GlobalHotkeys(this.Handle);
-            hotkey = m_hotkeys.RegisterGlobalHotKey((int)Keys.M, GlobalHotkeys.MOD_ALT);
         }
 
         public void AddChild(IntPtr handle)
@@ -429,6 +422,60 @@ namespace SuperPutty
             }
         }
 
+        private void registerHotkeys()
+        {
+            m_hotkeys = new GlobalHotkeys(this.Handle);
+            m_hotkeys.RegisterGlobalHotKey((int)Keys.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
+            m_hotkeys.RegisterGlobalHotKey((int)Keys.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
+            m_hotkeys.RegisterGlobalHotKey((int)Keys.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
+        }
+
+        private void handleHotkeys(ref Message m)
+        {
+            short hotkey = (short)m.WParam;
+            switch (m_hotkeys.GetHotKeyPurpose(hotkey))
+            {
+                case GlobalHotkeys.Purpose.NewMinttyTab:
+                    launchMintty();
+                    break;
+
+                case GlobalHotkeys.Purpose.Previous:
+                    nextTab(-1);
+                    break;
+
+                case GlobalHotkeys.Purpose.Next:
+                    nextTab(1);
+                    break;
+
+                case GlobalHotkeys.Purpose.None:
+                default:
+                    break;
+            }
+        }
+
+        private void nextTab(int direction)
+        {
+            int tabs = this.dockPanel1.Contents.Count - 1;
+            if (tabs > 0)
+            {
+                var handler = this.dockPanel1.Contents[1].DockHandler;
+                int current = handler.GetCurrentTabIndex();
+                current += direction;
+
+                if (current < 0)
+                {
+                    current = tabs - 1;
+                }
+                else
+                {
+                    current %= tabs;
+                }
+
+                handler.SetActiveTab(current);
+                //this.dockPanel1.Contents[1].DockHandler.SetActiveTab(0);
+            }
+        }
+
         protected override void WndProc(ref Message m)
         {
             const int WM_HOTKEY = 0x0312;
@@ -437,12 +484,12 @@ namespace SuperPutty
             switch (m.Msg)
             {
                 case WM_HOTKEY:
-                    if ((short)m.WParam == hotkey)
+                    // A hack to get hotkeys to work. Essentially, we only
+                    // handle the hotkey if the current foreground window
+                    // is one of our children.
+                    if (this.children.ContainsKey(GetForegroundWindow()))
                     {
-                        if (this.children.ContainsKey(GetForegroundWindow()))
-                        {
-                            launchMintty();
-                        }
+                        handleHotkeys(ref m);
                     }
                     break;
                 case WM_COPYDATA:

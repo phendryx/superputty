@@ -23,30 +23,35 @@ namespace SuperPutty.Classes
 
         public const int WM_HOTKEY = 0x312;
 
+        public enum Purpose
+        {
+            None, NewMinttyTab, Previous, Next, CloseTab
+        };
+
         private short hotkeyCount = 0;
 
         /// <summary>The IDs for the hotkeys</summary>
-        private Dictionary<short, bool> hotkeys;
+        private Dictionary<short, Purpose> hotkeys;
 
         public GlobalHotkeys(IntPtr handle)
         {
             //this.Handle = Process.GetCurrentProcess().Handle;
             this.Handle = handle;
-            hotkeys = new Dictionary<short, bool>();
+            hotkeys = new Dictionary<short, Purpose>();
         }
 
         /// <summary>Handle of the current process</summary>
         public IntPtr Handle;
 
         /// <summary>Register the hotkey</summary>
-        public short RegisterGlobalHotKey(int hotkey, int modifiers, IntPtr handle)
+        public short RegisterGlobalHotKey(int hotkey, int modifiers, Purpose purpose, IntPtr handle)
         {
             this.Handle = handle;
-            return RegisterGlobalHotKey(hotkey, modifiers);
+            return RegisterGlobalHotKey(hotkey, modifiers, purpose);
         }
 
         /// <summary>Register the hotkey</summary>
-        public short RegisterGlobalHotKey(int hotkey, int modifiers)
+        public short RegisterGlobalHotKey(int hotkey, int modifiers, Purpose purpose)
         {
             try
             {
@@ -54,7 +59,7 @@ namespace SuperPutty.Classes
                 if (!RegisterHotKey(this.Handle, hotkeyCount, (uint)modifiers, (uint)hotkey))
                     throw new Exception("Unable to register hotkey. Error: " + Marshal.GetLastWin32Error().ToString());
 
-                this.hotkeys.Add(hotkeyCount, true);
+                this.hotkeys.Add(hotkeyCount, purpose);
                 return hotkeyCount++;
             }
             catch (Exception ex)
@@ -65,6 +70,21 @@ namespace SuperPutty.Classes
             }
 
             return -1;
+        }
+
+        public bool HasHotKey(short hotkeyId)
+        {
+            return this.hotkeys.ContainsKey(hotkeyId);
+        }
+
+        public Purpose GetHotKeyPurpose(short hotkeyId)
+        {
+            if (this.hotkeys.ContainsKey(hotkeyId))
+            {
+                return this.hotkeys[hotkeyId];
+            }
+
+            return Purpose.None;
         }
 
         /// <summary>Unregister the hotkey</summary>
