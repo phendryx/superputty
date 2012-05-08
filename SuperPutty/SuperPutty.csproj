@@ -16,11 +16,26 @@
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     <NoStdLib>False</NoStdLib>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <ApplicationIcon>images\1306201958_server.ico</ApplicationIcon>
+    <ApplicationIcon></ApplicationIcon>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -79,6 +94,7 @@
     </Compile>
     <Compile Include="Classes\CLI.cs" />
     <Compile Include="Classes\Database.cs" />
+    <Compile Include="Classes\GlobalHotkeys.cs" />
     <Compile Include="ctlApplicationPanel.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -88,11 +104,15 @@
     <Compile Include="DebugLogViewer.Designer.cs">
       <DependentUpon>DebugLogViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="dlgEditSession.cs" />
+    <Compile Include="dlgEditSession.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="dlgEditSession.Designer.cs">
       <DependentUpon>dlgEditSession.cs</DependentUpon>
     </Compile>
-    <Compile Include="dlgLogin.cs" />
+    <Compile Include="dlgLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="dlgLogin.Designer.cs">
       <DependentUpon>dlgLogin.cs</DependentUpon>
     </Compile>
@@ -203,7 +223,23 @@
       <DependentUpon>ToolWindow.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
