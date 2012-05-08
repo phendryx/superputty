@@ -58,7 +58,7 @@
             this.buttonBrowsePutty.Location = new System.Drawing.Point(422, 111);
             this.buttonBrowsePutty.Name = "buttonBrowsePutty";
             this.buttonBrowsePutty.Size = new System.Drawing.Size(75, 23);
-            this.buttonBrowsePutty.TabIndex = 1;
+            this.buttonBrowsePutty.TabIndex = 5;
             this.buttonBrowsePutty.Text = "Browse";
             this.buttonBrowsePutty.UseVisualStyleBackColor = true;
             this.buttonBrowsePutty.Click += new System.EventHandler(this.buttonBrowse_Click);
@@ -68,7 +68,7 @@
             this.buttonBrowsePscp.Location = new System.Drawing.Point(422, 171);
             this.buttonBrowsePscp.Name = "buttonBrowsePscp";
             this.buttonBrowsePscp.Size = new System.Drawing.Size(75, 23);
-            this.buttonBrowsePscp.TabIndex = 3;
+            this.buttonBrowsePscp.TabIndex = 25;
             this.buttonBrowsePscp.Text = "Browse";
             this.buttonBrowsePscp.UseVisualStyleBackColor = true;
             this.buttonBrowsePscp.Click += new System.EventHandler(this.buttonBrowsePscp_Click);
@@ -98,14 +98,14 @@
             this.textBoxPuttyLocation.Location = new System.Drawing.Point(180, 113);
             this.textBoxPuttyLocation.Name = "textBoxPuttyLocation";
             this.textBoxPuttyLocation.Size = new System.Drawing.Size(236, 20);
-            this.textBoxPuttyLocation.TabIndex = 6;
+            this.textBoxPuttyLocation.TabIndex = 3;
             // 
             // textBoxPscpLocation
             // 
             this.textBoxPscpLocation.Location = new System.Drawing.Point(180, 173);
             this.textBoxPscpLocation.Name = "textBoxPscpLocation";
             this.textBoxPscpLocation.Size = new System.Drawing.Size(236, 20);
-            this.textBoxPscpLocation.TabIndex = 7;
+            this.textBoxPscpLocation.TabIndex = 20;
             // 
             // openFileDialog1
             // 
@@ -120,7 +120,7 @@
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
             this.richTextBox1.Size = new System.Drawing.Size(485, 95);
-            this.richTextBox1.TabIndex = 8;
+            this.richTextBox1.TabIndex = 30;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
             // textBoxMinttyLocation
@@ -128,7 +128,7 @@
             this.textBoxMinttyLocation.Location = new System.Drawing.Point(180, 143);
             this.textBoxMinttyLocation.Name = "textBoxMinttyLocation";
             this.textBoxMinttyLocation.Size = new System.Drawing.Size(236, 20);
-            this.textBoxMinttyLocation.TabIndex = 11;
+            this.textBoxMinttyLocation.TabIndex = 10;
             // 
             // label3
             // 
@@ -145,7 +145,7 @@
             this.buttonBrowseMintty.Location = new System.Drawing.Point(422, 141);
             this.buttonBrowseMintty.Name = "buttonBrowseMintty";
             this.buttonBrowseMintty.Size = new System.Drawing.Size(75, 23);
-            this.buttonBrowseMintty.TabIndex = 9;
+            this.buttonBrowseMintty.TabIndex = 15;
             this.buttonBrowseMintty.Text = "Browse";
             this.buttonBrowseMintty.UseVisualStyleBackColor = true;
             this.buttonBrowseMintty.Click += new System.EventHandler(this.buttonBrowseMintty_Click);
