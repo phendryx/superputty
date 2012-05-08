@@ -38,11 +38,14 @@
             this.textBoxPscpLocation = new System.Windows.Forms.TextBox();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
+            this.textBoxMinttyLocation = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.buttonBrowseMintty = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // buttonOk
             // 
-            this.buttonOk.Location = new System.Drawing.Point(422, 169);
+            this.buttonOk.Location = new System.Drawing.Point(422, 200);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(75, 23);
             this.buttonOk.TabIndex = 0;
@@ -62,7 +65,7 @@
             // 
             // buttonBrowsePscp
             // 
-            this.buttonBrowsePscp.Location = new System.Drawing.Point(422, 140);
+            this.buttonBrowsePscp.Location = new System.Drawing.Point(422, 171);
             this.buttonBrowsePscp.Name = "buttonBrowsePscp";
             this.buttonBrowsePscp.Size = new System.Drawing.Size(75, 23);
             this.buttonBrowsePscp.TabIndex = 3;
@@ -74,7 +77,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 116);
+            this.label1.Location = new System.Drawing.Point(18, 116);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(162, 15);
             this.label1.TabIndex = 4;
@@ -84,7 +87,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(16, 145);
+            this.label2.Location = new System.Drawing.Point(22, 176);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(158, 15);
             this.label2.TabIndex = 5;
@@ -99,7 +102,7 @@
             // 
             // textBoxPscpLocation
             // 
-            this.textBoxPscpLocation.Location = new System.Drawing.Point(180, 142);
+            this.textBoxPscpLocation.Location = new System.Drawing.Point(180, 173);
             this.textBoxPscpLocation.Name = "textBoxPscpLocation";
             this.textBoxPscpLocation.Size = new System.Drawing.Size(236, 20);
             this.textBoxPscpLocation.TabIndex = 7;
@@ -120,12 +123,42 @@
             this.richTextBox1.TabIndex = 8;
             this.richTextBox1.Text = resources.GetString("richTextBox1.Text");
             // 
+            // textBoxMinttyLocation
+            // 
+            this.textBoxMinttyLocation.Location = new System.Drawing.Point(180, 143);
+            this.textBoxMinttyLocation.Name = "textBoxMinttyLocation";
+            this.textBoxMinttyLocation.Size = new System.Drawing.Size(236, 20);
+            this.textBoxMinttyLocation.TabIndex = 11;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(12, 146);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(168, 15);
+            this.label3.TabIndex = 10;
+            this.label3.Text = "mintty.exe Location (Optional)";
+            // 
+            // buttonBrowseMintty
+            // 
+            this.buttonBrowseMintty.Location = new System.Drawing.Point(422, 141);
+            this.buttonBrowseMintty.Name = "buttonBrowseMintty";
+            this.buttonBrowseMintty.Size = new System.Drawing.Size(75, 23);
+            this.buttonBrowseMintty.TabIndex = 9;
+            this.buttonBrowseMintty.Text = "Browse";
+            this.buttonBrowseMintty.UseVisualStyleBackColor = true;
+            this.buttonBrowseMintty.Click += new System.EventHandler(this.buttonBrowseMintty_Click);
+            // 
             // dlgFindPutty
             // 
             this.AcceptButton = this.buttonOk;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(509, 204);
+            this.ClientSize = new System.Drawing.Size(509, 234);
+            this.Controls.Add(this.textBoxMinttyLocation);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.buttonBrowseMintty);
             this.Controls.Add(this.richTextBox1);
             this.Controls.Add(this.textBoxPscpLocation);
             this.Controls.Add(this.textBoxPuttyLocation);
@@ -153,5 +186,8 @@
         private System.Windows.Forms.TextBox textBoxPscpLocation;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.TextBox textBoxMinttyLocation;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button buttonBrowseMintty;
     }
 }

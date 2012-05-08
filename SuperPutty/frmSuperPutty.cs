@@ -33,11 +33,15 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Data.SQLite;
+using SuperPutty.Classes;
 
 namespace SuperPutty
 {
     public partial class frmSuperPutty : Form
     {
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern IntPtr GetForegroundWindow();
+
         private static string _PuttyExe;
         public static string PuttyExe
         {
@@ -53,6 +57,13 @@ namespace SuperPutty
             set { _PscpExe = value; }
         }
 
+        private static string _MinttyExe;
+        public static string MinttyExe
+        {
+            get { return _MinttyExe; }
+            set { _MinttyExe = value; }
+        }
+
         public static bool IsScpEnabled
         {
             get { return File.Exists(PscpExe); }
@@ -61,11 +72,17 @@ namespace SuperPutty
         private SessionTreeview m_Sessions;
     
 		private Classes.Database m_db;
+
+        private Dictionary<IntPtr, bool> children;
+        GlobalHotkeys m_hotkeys;
+        short hotkey;
 		
         public frmSuperPutty(string[] args)
         {
             // Check SQLite Database
             openOrCreateSQLiteDatabase();
+            this.children = new Dictionary<IntPtr, bool>();
+            this.AddChild(this.Handle);
 
             #region Exe Paths
             // Get putty executable path
@@ -80,16 +97,15 @@ namespace SuperPutty
                 PscpExe = this.m_db.GetKey("pscp_exe");
             }
 
+            // Get mintty executable path
+            if (File.Exists(this.m_db.GetKey("mintty_exe")))
+            {
+                MinttyExe = this.m_db.GetKey("mintty_exe");
+            }
+
             if (String.IsNullOrEmpty(PuttyExe))
             {
-                dlgFindPutty dialog = new dlgFindPutty();
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                	this.m_db.SetKey("putty_exe", dialog.PuttyLocation);
-                	this.m_db.SetKey("pscp_exe", dialog.PscpLocation);
-		            PuttyExe = this.m_db.GetKey("putty_exe");
-		            PscpExe = this.m_db.GetKey("pscp_exe");
-                }
+                editLocations();
             }
 
             if (String.IsNullOrEmpty(PuttyExe))
@@ -115,6 +131,7 @@ namespace SuperPutty
             ProtocolBox.SelectedItem = ProtocolBox.Items[0];
 			
             dockPanel1.ActiveDocumentChanged += dockPanel1_ActiveDocumentChanged;
+            dockPanel1.LostFocus += dockPanel1_ActiveDocumentChanged;
 
             /* 
              * Open the session treeview and dock it on the right
@@ -143,6 +160,44 @@ namespace SuperPutty
             
             // Set window state and size
             setWindowStateAndSize();
+
+            registerHotkeys();
+        }
+
+        private void registerHotkeys()
+        {
+            m_hotkeys = new GlobalHotkeys(this.Handle);
+            hotkey = m_hotkeys.RegisterGlobalHotKey((int)Keys.M, GlobalHotkeys.MOD_ALT);
+        }
+
+        public void AddChild(IntPtr handle)
+        {
+            if (!this.children.ContainsKey(handle))
+            {
+                this.children.Add(handle, true);
+            }
+        }
+
+        public void RemoveChild(IntPtr handle)
+        {
+            if (this.children.ContainsKey(handle))
+            {
+                this.children.Remove(handle);
+            }
+        }
+
+        private void editLocations()
+        {
+            dlgFindPutty dialog = new dlgFindPutty();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                this.m_db.SetKey("putty_exe", dialog.PuttyLocation);
+                this.m_db.SetKey("pscp_exe", dialog.PscpLocation);
+                this.m_db.SetKey("mintty_exe", dialog.MinttyLocation);
+                PuttyExe = dialog.PuttyLocation;
+                PscpExe = dialog.PscpLocation;
+                MinttyExe = dialog.MinttyLocation;
+            }
         }
 
         /// <summary>
@@ -198,13 +253,7 @@ namespace SuperPutty
 
         private void puTTYScpLocationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dlgFindPutty dialog = new dlgFindPutty();
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                PuttyExe = dialog.PuttyLocation;
-                PscpExe = dialog.PscpLocation;
-            }
+            editLocations();
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -304,8 +353,13 @@ namespace SuperPutty
 	            }
 			}
         }
-        
+
         public void CreatePuttyPanel(SessionData sessionData)
+        {
+            CreatePuttyPanel(sessionData, true);
+        }
+        
+        public void CreatePuttyPanel(SessionData sessionData, bool isPutty)
         {
             ctlPuttyPanel sessionPanel = null;
 
@@ -338,8 +392,20 @@ namespace SuperPutty
                 }
             };
 
-            sessionPanel = new ctlPuttyPanel(this, sessionData, callback);
+            sessionPanel = new ctlPuttyPanel(this, sessionData, callback, isPutty);
             sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
+        }
+
+        private void newMintty_Click(object sender, EventArgs e)
+        {
+            launchMintty();
+        }
+
+        private void launchMintty()
+        {
+            SessionData sessionData = new SessionData();
+            sessionData.SessionName = "mintty";
+            CreatePuttyPanel(sessionData, false);
         }
 
         public void CreateRemoteFileListPanel(SessionData sessionData)
@@ -365,13 +431,30 @@ namespace SuperPutty
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == 0x004A)
+            const int WM_HOTKEY = 0x0312;
+            const int WM_COPYDATA = 0x004A;
+
+            switch (m.Msg)
             {
-                COPYDATA cd = (COPYDATA) Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
-                string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
-                string[] args = strArgs.Split(' ');
-                ParseClArguments(args);
+                case WM_HOTKEY:
+                    if ((short)m.WParam == hotkey)
+                    {
+                        if (this.children.ContainsKey(GetForegroundWindow()))
+                        {
+                            launchMintty();
+                        }
+                    }
+                    break;
+                case WM_COPYDATA:
+                    COPYDATA cd = (COPYDATA)Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
+                    string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
+                    string[] args = strArgs.Split(' ');
+                    ParseClArguments(args);
+                    break;
+                default:
+                    break;
             }
+
             base.WndProc(ref m);
         }
 
@@ -503,7 +586,7 @@ namespace SuperPutty
         
 	    private void setAutomaticUpdateCheckMenuItem()
         {
-        	// Get the current value from the database
+        	// Get the current value from the d1Gatabase
         	Classes.Database d = new SuperPutty.Classes.Database();
         	d.Open();
 			string key = "automatic_update_check";

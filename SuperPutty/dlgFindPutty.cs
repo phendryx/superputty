@@ -47,6 +47,13 @@ namespace SuperPutty
             private set { m_PscpLocation = value; }
         }
 
+        private string m_MinttyLocation;
+        public string MinttyLocation
+        {
+            get { return m_MinttyLocation; }
+            private set { m_MinttyLocation = value; }
+        }
+
         public dlgFindPutty()
         {
             InitializeComponent();
@@ -101,6 +108,11 @@ namespace SuperPutty
                 PscpLocation = textBoxPscpLocation.Text;
             }
 
+            if (!String.IsNullOrEmpty(textBoxMinttyLocation.Text) && File.Exists(textBoxMinttyLocation.Text))
+            {
+                MinttyLocation = textBoxMinttyLocation.Text;
+            }
+
             if (!String.IsNullOrEmpty(textBoxPuttyLocation.Text) && File.Exists(textBoxPuttyLocation.Text))
             {
                 PuttyLocation = textBoxPuttyLocation.Text;
@@ -124,6 +136,15 @@ namespace SuperPutty
                 if (!String.IsNullOrEmpty(openFileDialog1.FileName))
                     textBoxPuttyLocation.Text = openFileDialog1.FileName;
             }            
+        }
+
+        private void buttonBrowseMintty_Click(object sender, EventArgs e)
+        {
+            openFileDialog1.Filter = "Mintty|mintty.exe";
+            openFileDialog1.FileName = "mintty.exe";
+            openFileDialog1.ShowDialog();
+            if (!String.IsNullOrEmpty(openFileDialog1.FileName))
+                textBoxMinttyLocation.Text = openFileDialog1.FileName;
         }
 
         private void buttonBrowsePscp_Click(object sender, EventArgs e)

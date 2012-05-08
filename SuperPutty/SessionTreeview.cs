@@ -174,7 +174,7 @@ namespace SuperPutty
         /// <param name="e">An Empty EventArgs object</param>
         private void treeView1_DoubleClick(object sender, EventArgs e)
         {
-            if (treeView1.SelectedNode.ImageIndex > 0)
+            if (treeView1.SelectedNode != null && treeView1.SelectedNode.ImageIndex > 0)
             {
                 SessionData sessionData = (SessionData)treeView1.SelectedNode.Tag;
                 m_SuperPutty.CreatePuttyPanel(sessionData);

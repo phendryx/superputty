@@ -150,10 +150,14 @@ namespace SuperPutty
 
         #region Win32 Constants/Enums
         private const int GWL_STYLE = (-16);
+        private const int GWL_EXSTYLE = (-20);
 
         private const int WM_CLOSE = 0x10;
         public const uint WS_CAPTION = 0x00C00000;
+        public const uint WS_CHILD = 0x40000000;
+        public const uint WS_EX_NOACTIVATE = 0x08000000;
         public const uint WS_BORDER = 0x00800000;
+        public const uint WS_POPUP = 0x80000000;
         public const uint WS_VSCROLL = 0x00200000;
         public const uint WS_THICKFRAME = 0x00040000;
 
@@ -1215,7 +1219,7 @@ namespace SuperPutty
                     	System.Threading.Thread.Sleep(200);
                     }
                     
-                    m_AppWin = m_Process.MainWindowHandle;                   
+                    m_AppWin = m_Process.MainWindowHandle;
                 }
                 catch (InvalidOperationException ex)
                 {
@@ -1255,15 +1259,19 @@ namespace SuperPutty
 
                 // set window parameters (how it's displayed)
                 long lStyle = GetWindowLong(m_AppWin, GWL_STYLE);
-                lStyle &= ~(WS_BORDER | WS_THICKFRAME); 
+                lStyle &= ~(WS_BORDER | WS_THICKFRAME);
                 SetWindowLong(m_AppWin, GWL_STYLE, lStyle);
 
                 // Move the child so it's located over the parent
                 MoveWindow(m_AppWin, 0, 0, this.Width, this.Height, true);
-         
             }
                   
             base.OnVisibleChanged(e);
+        }
+
+        public IntPtr GetChildHandle()
+        {
+            return m_AppWin;
         }
         
         /// <summary>
@@ -1276,7 +1284,7 @@ namespace SuperPutty
             {
                 PostMessage(m_AppWin, WM_CLOSE, 0, 0);
 
-                System.Threading.Thread.Sleep(1000);
+                //System.Threading.Thread.Sleep(1000);
 
                 m_AppWin = IntPtr.Zero;
             }

@@ -45,34 +45,41 @@ namespace SuperPutty
         	get { return this.applicationwrapper1.ApplicationWindowTitle; }
         }
 
-        public ctlPuttyPanel(frmSuperPutty superPutty, SessionData session, PuttyClosedCallback callback)
+        public ctlPuttyPanel(frmSuperPutty superPutty, SessionData session, PuttyClosedCallback callback, bool isPutty)
         {
             m_SuperPutty = superPutty;
             m_Session = session;
             m_ApplicationExit = callback;
 
-            string args = "-" + session.Proto.ToString().ToLower() + " ";            
-            args += (!String.IsNullOrEmpty(m_Session.Password) && m_Session.Password.Length > 0) ? "-pw " + m_Session.Password + " " : "";
-            args += "-P " + m_Session.Port + " ";
-            args += (!String.IsNullOrEmpty(m_Session.PuttySession)) ? "-load \"" + m_Session.PuttySession + "\" " : "";
-            args += (!String.IsNullOrEmpty(m_Session.Username) && m_Session.Username.Length > 0) ? m_Session.Username + "@" : "";
-            args += m_Session.Host;
-            Logger.Log("Args: '{0}'", args);
-            this.ApplicationParameters = args;
+            if (isPutty)
+            {
+                string args = "-" + session.Proto.ToString().ToLower() + " ";
+                args += (!String.IsNullOrEmpty(m_Session.Password) && m_Session.Password.Length > 0) ? "-pw " + m_Session.Password + " " : "";
+                args += "-P " + m_Session.Port + " ";
+                args += (!String.IsNullOrEmpty(m_Session.PuttySession)) ? "-load \"" + m_Session.PuttySession + "\" " : "";
+                args += (!String.IsNullOrEmpty(m_Session.Username) && m_Session.Username.Length > 0) ? m_Session.Username + "@" : "";
+                args += m_Session.Host;
+                Logger.Log("Args: '{0}'", args);
+                this.ApplicationParameters = args;
+            }
+            else
+            {
+                this.ApplicationParameters = "/bin/bash -l";
+            }
 
             InitializeComponent();
 
             this.Text = session.SessionName;
 
-            CreatePanel();
+            CreatePanel(isPutty);
         }
 
-        private void CreatePanel()
+        private void CreatePanel(bool isPutty)
         {
             this.applicationwrapper1 = new ApplicationPanel();
             this.SuspendLayout();            
             this.applicationwrapper1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.applicationwrapper1.ApplicationName = frmSuperPutty.PuttyExe;
+            this.applicationwrapper1.ApplicationName = isPutty ? frmSuperPutty.PuttyExe : frmSuperPutty.MinttyExe;
             this.applicationwrapper1.ApplicationParameters = this.ApplicationParameters;
             this.applicationwrapper1.Location = new System.Drawing.Point(0, 0);
             this.applicationwrapper1.Name = "applicationControl1";
@@ -80,8 +87,14 @@ namespace SuperPutty
             this.applicationwrapper1.TabIndex = 0;            
             this.applicationwrapper1.m_CloseCallback = this.m_ApplicationExit;
             this.Controls.Add(this.applicationwrapper1);
+            this.applicationwrapper1.VisibleChanged += applicationwrapper1_VisibleChanged;
 
             this.ResumeLayout();
+        }
+
+        private void applicationwrapper1_VisibleChanged(object sender, EventArgs e)
+        {
+            m_SuperPutty.AddChild(this.applicationwrapper1.GetChildHandle());
         }
 
         private void closeSessionToolStripMenuItem_Click(object sender, EventArgs e)
