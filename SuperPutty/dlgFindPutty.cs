@@ -67,6 +67,11 @@ namespace SuperPutty
                 {
                     textBoxPscpLocation.Text = frmSuperPutty.PscpExe;
                 }
+
+                if (!String.IsNullOrEmpty(frmSuperPutty.MinttyExe) && File.Exists(frmSuperPutty.MinttyExe))
+                {
+                    textBoxMinttyLocation.Text = frmSuperPutty.MinttyExe;
+                }
             }
             else if(!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("ProgramFiles(x86)")))
             {
