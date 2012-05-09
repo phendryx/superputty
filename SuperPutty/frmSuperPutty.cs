@@ -472,7 +472,6 @@ namespace SuperPutty
                 }
 
                 handler.SetActiveTab(current);
-                //this.dockPanel1.Contents[1].DockHandler.SetActiveTab(0);
             }
         }
 

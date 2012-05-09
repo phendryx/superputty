@@ -1280,6 +1280,8 @@ namespace SuperPutty
         /// <param name="e"></param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
+            base.OnHandleDestroyed(e);
+
             if (m_AppWin != IntPtr.Zero)
             {
                 PostMessage(m_AppWin, WM_CLOSE, 0, 0);
@@ -1288,8 +1290,6 @@ namespace SuperPutty
 
                 m_AppWin = IntPtr.Zero;
             }
-
-            base.OnHandleDestroyed(e);
         }
 
         /// <summary>

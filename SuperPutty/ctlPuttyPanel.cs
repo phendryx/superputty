@@ -88,14 +88,30 @@ namespace SuperPutty
             this.applicationwrapper1.m_CloseCallback = this.m_ApplicationExit;
             this.Controls.Add(this.applicationwrapper1);
             this.applicationwrapper1.VisibleChanged += applicationwrapper1_VisibleChanged;
+            this.applicationwrapper1.HandleDestroyed += applicationwrapper1_HandleDestroyed;
 
             this.ResumeLayout();
         }
 
-        // TODO: Still need to remove the child when it is closed
+        /// <summary>
+        /// Adding the child handle into our children. We use this information to decide
+        /// when to trigger hotkeys.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void applicationwrapper1_VisibleChanged(object sender, EventArgs e)
         {
             m_SuperPutty.AddChild(this.applicationwrapper1.GetChildHandle());
+        }
+
+        /// <summary>
+        /// Remove the child handle from our children.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void applicationwrapper1_HandleDestroyed(object sender, EventArgs e)
+        {
+            m_SuperPutty.RemoveChild(this.applicationwrapper1.GetChildHandle());
         }
 
         private void closeSessionToolStripMenuItem_Click(object sender, EventArgs e)
