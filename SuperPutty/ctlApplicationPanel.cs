@@ -129,17 +129,17 @@ namespace SuperPutty
         [DllImport("user32.dll", SetLastError = true)]
         private static extern long SetParent(IntPtr hWndChild, IntPtr hWndParent);
 
-        [DllImport("user32.dll", EntryPoint = "GetWindowLongA", SetLastError = true)]
-        private static extern long GetWindowLong(IntPtr hWnd, int nIndex);
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
 
-        [DllImport("user32.dll", EntryPoint = "SetWindowLongA", SetLastError = true)]
-        private static extern long SetWindowLong(IntPtr hWnd, int nIndex, long dwNewLong);
+        [DllImport("user32.dll")]
+        private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool MoveWindow(IntPtr hWnd, int x, int y, int cx, int cy, bool repaint);
 
         [DllImport("user32.dll", EntryPoint = "PostMessageA", SetLastError = true)]
-        private static extern bool PostMessage(IntPtr hWnd, uint Msg, long wParam, long lParam);
+        private static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
@@ -153,13 +153,11 @@ namespace SuperPutty
         private const int GWL_EXSTYLE = (-20);
 
         private const int WM_CLOSE = 0x10;
-        public const uint WS_CAPTION = 0x00C00000;
-        public const uint WS_CHILD = 0x40000000;
-        public const uint WS_EX_NOACTIVATE = 0x08000000;
-        public const uint WS_BORDER = 0x00800000;
-        public const uint WS_POPUP = 0x80000000;
-        public const uint WS_VSCROLL = 0x00200000;
-        public const uint WS_THICKFRAME = 0x00040000;
+        public const int WS_CAPTION = 0x00C00000;
+        public const int WS_EX_NOACTIVATE = 0x08000000;
+        public const int WS_BORDER = 0x00800000;
+        public const int WS_VSCROLL = 0x00200000;
+        public const int WS_THICKFRAME = 0x00040000;
 
         [Flags]
         public enum AnimateWindowFlags
@@ -1258,7 +1256,7 @@ namespace SuperPutty
                 ShowWindow(m_AppWin, WindowShowStyle.Maximize);
 
                 // set window parameters (how it's displayed)
-                long lStyle = GetWindowLong(m_AppWin, GWL_STYLE);
+                int lStyle = GetWindowLong(m_AppWin, GWL_STYLE);
                 lStyle &= ~(WS_BORDER | WS_THICKFRAME);
                 SetWindowLong(m_AppWin, GWL_STYLE, lStyle);
 
