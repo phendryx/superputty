@@ -17,9 +17,6 @@ namespace SuperPutty.Classes
     /// </summary>
     public class KeyboardListener : IDisposable
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern IntPtr GetForegroundWindow();
-
         private GlobalHotkeys hotkeys;
         private frmSuperPutty form;
 
@@ -101,9 +98,12 @@ namespace SuperPutty.Classes
                     wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_SYSKEYUP)
                 {
                     // Captures the character(s) pressed only on WM_KEYDOWN
+                    // NOTE: Currently not used because it's causing a bug :( -ak
+                    /*
                     chars = InterceptKeys.VKCodeToString((uint)Marshal.ReadInt32(lParam),
                         (wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_KEYDOWN ||
                         wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_SYSKEYDOWN));
+                    */
 
                     int vkCode = Marshal.ReadInt32(lParam);
 
@@ -330,6 +330,13 @@ namespace SuperPutty.Classes
         private static byte[] lastKeyState = new byte[255];
         private static bool lastIsDead = false;
 
+// The reason to not use this at all is because there's a bug in here somewhere.
+// The purpose of this function is to get the character that was pressed. The problem
+// is that somewhere along the way, in certain conditions dealing with our code, it takes
+// the focus away from an active window that is not ours. Look at usage at line ~100
+// to see how it is used.
+#if FALSE
+
         /// <summary>
         /// Convert VKCode to Unicode.
         /// <remarks>isKeyDown is required for because of keyboard state inconsistencies!</remarks>
@@ -447,6 +454,8 @@ namespace SuperPutty.Classes
                 rc = ToUnicodeEx(vk, sc, lpKeyStateNull, sb, sb.Capacity, 0, hkl);
             } while (rc < 0);
         }
+#endif
+
         #endregion
     }
     #endregion
