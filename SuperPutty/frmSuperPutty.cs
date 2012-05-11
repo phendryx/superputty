@@ -446,6 +446,16 @@ namespace SuperPutty
             m_hotkeys.RegisterGlobalHotkey(Key.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
             m_hotkeys.RegisterGlobalHotkey(Key.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
             m_hotkeys.RegisterGlobalHotkey(Key.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
+            m_hotkeys.RegisterGlobalHotkey(Key.D1, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab1);
+            m_hotkeys.RegisterGlobalHotkey(Key.D2, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab2);
+            m_hotkeys.RegisterGlobalHotkey(Key.D3, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab3);
+            m_hotkeys.RegisterGlobalHotkey(Key.D4, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab4);
+            m_hotkeys.RegisterGlobalHotkey(Key.D5, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab5);
+            m_hotkeys.RegisterGlobalHotkey(Key.D6, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab6);
+            m_hotkeys.RegisterGlobalHotkey(Key.D7, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab7);
+            m_hotkeys.RegisterGlobalHotkey(Key.D8, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab8);
+            m_hotkeys.RegisterGlobalHotkey(Key.D9, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.LastTab);
+
             m_keyboard.KeyDown += new RawKeyEventHandler(KListener_KeyDown);
             m_keyboard.KeyUp += new RawKeyEventHandler(KListener_KeyUp);
         }
