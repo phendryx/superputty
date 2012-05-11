@@ -100,6 +100,7 @@
     <Compile Include="Classes\Database.cs" />
     <Compile Include="Classes\GlobalHotkeys.cs" />
     <Compile Include="Classes\KeyboardListener.cs" />
+    <Compile Include="Classes\WindowTitleTracker.cs" />
     <Compile Include="ctlApplicationPanel.cs">
       <SubType>Component</SubType>
     </Compile>

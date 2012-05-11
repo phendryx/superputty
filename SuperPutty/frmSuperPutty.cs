@@ -79,6 +79,7 @@ namespace SuperPutty
 
         GlobalHotkeys m_hotkeys;
         KeyboardListener m_keyboard;
+        WindowTitleTracker m_titleTracker;
 
         ~frmSuperPutty()
         {
@@ -90,6 +91,7 @@ namespace SuperPutty
             this.children = new ConcurrentDictionary<IntPtr, bool>();
             m_hotkeys = new GlobalHotkeys();
             m_keyboard = new KeyboardListener(this, m_hotkeys);
+            m_titleTracker = new WindowTitleTracker(this);
 
             // Check SQLite Database
             openOrCreateSQLiteDatabase();
@@ -194,8 +196,12 @@ namespace SuperPutty
 
         public bool ContainsForegroundWindow()
         {
-            IntPtr foreground = GetForegroundWindow();
-            return this.children.ContainsKey(foreground);
+            return ContainsChild(GetForegroundWindow());
+        }
+
+        public bool ContainsChild(IntPtr child)
+        {
+            return this.children.ContainsKey(child);
         }
 
         private void editLocations()
