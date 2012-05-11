@@ -34,6 +34,8 @@ using Microsoft.Win32;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Data.SQLite;
 using SuperPutty.Classes;
+using System.Windows.Input;
+using System.Collections.Concurrent;
 
 namespace SuperPutty
 {
@@ -73,14 +75,24 @@ namespace SuperPutty
     
 		private Classes.Database m_db;
 
-        private Dictionary<IntPtr, bool> children;
+        private ConcurrentDictionary<IntPtr, bool> children;
+
         GlobalHotkeys m_hotkeys;
-		
+        KeyboardListener m_keyboard;
+
+        ~frmSuperPutty()
+        {
+            m_keyboard.Dispose();
+        }
+
         public frmSuperPutty(string[] args)
         {
+            this.children = new ConcurrentDictionary<IntPtr, bool>();
+            m_hotkeys = new GlobalHotkeys();
+            m_keyboard = new KeyboardListener(this, m_hotkeys);
+
             // Check SQLite Database
             openOrCreateSQLiteDatabase();
-            this.children = new Dictionary<IntPtr, bool>();
             this.AddChild(this.Handle);
 
             #region Exe Paths
@@ -167,16 +179,23 @@ namespace SuperPutty
         {
             if (!this.children.ContainsKey(handle))
             {
-                this.children.Add(handle, true);
+                this.children.TryAdd(handle, true);
             }
         }
 
         public void RemoveChild(IntPtr handle)
         {
+            bool outValue;
             if (this.children.ContainsKey(handle))
             {
-                this.children.Remove(handle);
+                this.children.TryRemove(handle, out outValue);
             }
+        }
+
+        public bool ContainsForegroundWindow()
+        {
+            IntPtr foreground = GetForegroundWindow();
+            return this.children.ContainsKey(foreground);
         }
 
         private void editLocations()
@@ -424,16 +443,30 @@ namespace SuperPutty
 
         private void registerHotkeys()
         {
-            m_hotkeys = new GlobalHotkeys(this.Handle);
-            m_hotkeys.RegisterGlobalHotKey((int)Keys.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
-            m_hotkeys.RegisterGlobalHotKey((int)Keys.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
-            m_hotkeys.RegisterGlobalHotKey((int)Keys.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
+            m_hotkeys.RegisterGlobalHotkey(Key.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
+            m_hotkeys.RegisterGlobalHotkey(Key.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
+            m_hotkeys.RegisterGlobalHotkey(Key.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
+            m_keyboard.KeyDown += new RawKeyEventHandler(KListener_KeyDown);
+            m_keyboard.KeyUp += new RawKeyEventHandler(KListener_KeyUp);
         }
 
-        private void handleHotkeys(ref Message m)
+        void KListener_KeyDown(object sender, RawKeyEventArgs args)
         {
-            short hotkey = (short)m.WParam;
-            switch (m_hotkeys.GetHotKeyPurpose(hotkey))
+            m_hotkeys.KeyDown(args.Key);
+            if (ContainsForegroundWindow())
+            {
+                handleHotkeys(args.Key);
+            }
+        }
+
+        void KListener_KeyUp(object sender, RawKeyEventArgs args)
+        {
+            m_hotkeys.KeyUp(args.Key);
+        }
+
+        private void handleHotkeys(Key key)
+        {
+            switch (m_hotkeys.GetHotkey(key))
             {
                 case GlobalHotkeys.Purpose.NewMinttyTab:
                     launchMintty();
@@ -447,6 +480,18 @@ namespace SuperPutty
                     nextTab(1);
                     break;
 
+                case GlobalHotkeys.Purpose.Tab1:
+                case GlobalHotkeys.Purpose.Tab2:
+                case GlobalHotkeys.Purpose.Tab3:
+                case GlobalHotkeys.Purpose.Tab4:
+                case GlobalHotkeys.Purpose.Tab5:
+                case GlobalHotkeys.Purpose.Tab6:
+                case GlobalHotkeys.Purpose.Tab7:
+                case GlobalHotkeys.Purpose.Tab8:
+                case GlobalHotkeys.Purpose.LastTab:
+                    selectTab(m_hotkeys.GetHotkey(key));
+                    break;
+
                 case GlobalHotkeys.Purpose.None:
                 default:
                     break;
@@ -455,11 +500,10 @@ namespace SuperPutty
 
         private void nextTab(int direction)
         {
-            int tabs = this.dockPanel1.Contents.Count - 1;
-            if (tabs > 0)
+            int tabs = this.children.Count - 1;
+            if (tabs > 1)
             {
-                var handler = this.dockPanel1.Contents[1].DockHandler;
-                int current = handler.GetCurrentTabIndex();
+                int current = this.dockPanel1.Contents[1].DockHandler.GetCurrentTabIndex();
                 current += direction;
 
                 if (current < 0)
@@ -471,7 +515,34 @@ namespace SuperPutty
                     current %= tabs;
                 }
 
-                handler.SetActiveTab(current);
+                selectTab(current);
+            }
+        }
+
+        private void selectTab(GlobalHotkeys.Purpose tabPosition)
+        {
+            int tabs = this.children.Count - 1;
+            if (tabs > 1)
+            {
+                int index = ((int)tabPosition) % ((int)GlobalHotkeys.Purpose.Tab1);
+                if (tabPosition == GlobalHotkeys.Purpose.LastTab)
+                {
+                    index = this.dockPanel1.Contents.Count - 1;
+                }
+                selectTab(index);
+            }
+        }
+
+        private void selectTab(int index)
+        {
+            if (this.children.Count > 1)
+            {
+                IDockContent content = this.dockPanel1.Contents[1].DockHandler.SetActiveTab(index);
+                if (content != null)
+                {
+                    ctlPuttyPanel p = (ctlPuttyPanel)content;
+                    p.SetFocusToChildApplication();
+                }
             }
         }
 
@@ -488,7 +559,7 @@ namespace SuperPutty
                     // is one of our children.
                     if (this.children.ContainsKey(GetForegroundWindow()))
                     {
-                        handleHotkeys(ref m);
+                        //handleHotkeys(ref m);
                     }
                     break;
                 case WM_COPYDATA:
