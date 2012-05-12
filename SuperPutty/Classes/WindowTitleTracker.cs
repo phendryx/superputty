@@ -63,8 +63,7 @@ namespace SuperPutty.Classes
                 int capacity = GetWindowTextLength(new HandleRef(this, hwnd)) * 2;
                 StringBuilder stringBuilder = new StringBuilder(capacity);
                 GetWindowText(new HandleRef(this, hwnd), stringBuilder, stringBuilder.Capacity);
-
-                Console.WriteLine("Title changed: " + stringBuilder.ToString());
+                this.m_form.SetPanelTitle(hwnd, stringBuilder.ToString());
             }
         }
     }

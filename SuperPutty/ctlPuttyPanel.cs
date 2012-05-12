@@ -101,7 +101,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void applicationwrapper1_VisibleChanged(object sender, EventArgs e)
         {
-            m_SuperPutty.AddChild(this.applicationwrapper1.GetChildHandle());
+            m_SuperPutty.AddChild(this, this.applicationwrapper1.GetChildHandle());
         }
 
         /// <summary>

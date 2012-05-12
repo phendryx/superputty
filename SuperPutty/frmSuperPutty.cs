@@ -76,6 +76,7 @@ namespace SuperPutty
 		private Classes.Database m_db;
 
         private ConcurrentDictionary<IntPtr, bool> children;
+        private ConcurrentDictionary<IntPtr, ctlPuttyPanel> m_panelMapping;
 
         GlobalHotkeys m_hotkeys;
         KeyboardListener m_keyboard;
@@ -89,6 +90,7 @@ namespace SuperPutty
         public frmSuperPutty(string[] args)
         {
             this.children = new ConcurrentDictionary<IntPtr, bool>();
+            m_panelMapping = new ConcurrentDictionary<IntPtr, ctlPuttyPanel>();
             m_hotkeys = new GlobalHotkeys();
             m_keyboard = new KeyboardListener(this, m_hotkeys);
             m_titleTracker = new WindowTitleTracker(this);
@@ -185,6 +187,12 @@ namespace SuperPutty
             }
         }
 
+        public void AddChild(ctlPuttyPanel panel, IntPtr handle)
+        {
+            AddChild(handle);
+            m_panelMapping.TryAdd(handle, panel);
+        }
+
         public void RemoveChild(IntPtr handle)
         {
             bool outValue;
@@ -216,6 +224,19 @@ namespace SuperPutty
                 PscpExe = dialog.PscpLocation;
                 MinttyExe = dialog.MinttyLocation;
             }
+        }
+
+        public void SetPanelTitle(IntPtr handle, String title)
+        {
+            if (this.m_panelMapping.ContainsKey(handle))
+            {
+                SetPanelTitle(this.m_panelMapping[handle], title);
+            }
+        }
+
+        public void SetPanelTitle(ctlPuttyPanel panel, String title)
+        {
+            panel.TabText = title;
         }
 
         /// <summary>
