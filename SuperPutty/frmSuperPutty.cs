@@ -177,6 +177,8 @@ namespace SuperPutty
             setWindowStateAndSize();
 
             registerHotkeys();
+
+            focusHacks();
         }
 
         public void AddChild(IntPtr handle)
@@ -239,6 +241,18 @@ namespace SuperPutty
             panel.TabText = title;
         }
 
+        private void focusCurrentTab()
+        {
+            if (dockPanel1.ActiveDocument is ctlPuttyPanel)
+            {
+                ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
+
+                this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
+                p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
+                p.SetFocusToChildApplication();
+            }
+        }
+
         /// <summary>
         /// Handles focusing on tabs/windows which host PuTTY
         /// </summary>
@@ -246,14 +260,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            if (dockPanel1.ActiveDocument is ctlPuttyPanel)
-            {
-                ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
-
-	            this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
-				p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
-                p.SetFocusToChildApplication();
-            }
+            focusCurrentTab();
         }
 
 
@@ -585,20 +592,10 @@ namespace SuperPutty
 
         protected override void WndProc(ref Message m)
         {
-            const int WM_HOTKEY = 0x0312;
             const int WM_COPYDATA = 0x004A;
 
             switch (m.Msg)
             {
-                case WM_HOTKEY:
-                    // A hack to get hotkeys to work. Essentially, we only
-                    // handle the hotkey if the current foreground window
-                    // is one of our children.
-                    if (this.children.ContainsKey(GetForegroundWindow()))
-                    {
-                        //handleHotkeys(ref m);
-                    }
-                    break;
                 case WM_COPYDATA:
                     COPYDATA cd = (COPYDATA)Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
                     string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
@@ -609,6 +606,7 @@ namespace SuperPutty
                     break;
             }
 
+            WndProcForFocus(ref m);
             base.WndProc(ref m);
         }
 
@@ -855,5 +853,66 @@ namespace SuperPutty
 			// Set the checked property
 			this.additionalTiming.Checked = val;
         }
+
+
+        #region FocusHacks Code used to get the children window to focus at the right time
+
+        private DateTime m_lastMouseDownOnTitleBar = DateTime.Now;
+        private TimeSpan m_delayUntilMouseMove = new TimeSpan(0, 0, 0, 0, 200); // 200ms
+        private Point m_mouseDownLocation = new Point(0, 0);
+
+        private int GET_X_LPARAM(int lParam)
+        {
+            return (lParam & 0xffff);
+        }
+
+        private int GET_Y_LPARAM(int lParam)
+        {
+            return (lParam >> 16);
+        }
+
+        private void WndProcForFocus(ref Message m)
+        {
+            const int WM_NCLBUTTONDOWN = 0x00A1;
+            const int WM_NCMOUSEMOVE = 0x00A0;
+
+            switch (m.Msg)
+            {
+                case WM_NCLBUTTONDOWN:
+                    // This is in conjunction with the WM_NCMOUSEMOVE. We cannot detect
+                    // WM_NCLBUTTONUP because it gets swallowed up on many occasions. As a result
+                    // we detect the button down and check the NCMOUSEMOVE to see if it has
+                    // changed location. If the mouse location is different, then we let
+                    // the resize handler deal with the focus. If not, then we assume that it
+                    // is a mouseup action.
+                    this.m_lastMouseDownOnTitleBar = DateTime.Now;
+                    m_mouseDownLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
+                    break;
+                case WM_NCMOUSEMOVE:
+                    Point currentLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
+                    if ((this.m_lastMouseDownOnTitleBar - DateTime.Now < this.m_delayUntilMouseMove)
+                            && currentLocation == m_mouseDownLocation)
+                    {
+                        focusCurrentTab();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // Hook into events to handle focus problems.
+        private void focusHacks()
+        {
+            this.ResizeEnd += HandleResizeEnd;
+        }
+
+        // Handle various events to keep the child window focused
+        private void HandleResizeEnd(Object sender, EventArgs e)
+        {
+            focusCurrentTab();
+        }
+
+        #endregion
     }
 }
