@@ -606,8 +606,11 @@ namespace SuperPutty
                     break;
             }
 
-            WndProcForFocus(ref m);
-            base.WndProc(ref m);
+            bool callBase = WndProcForFocus(ref m);
+            if (callBase)
+            {
+                base.WndProc(ref m);
+            }
         }
 
         
@@ -856,6 +859,8 @@ namespace SuperPutty
 
 
         #region FocusHacks Code used to get the children window to focus at the right time
+        [DllImport("user32.dll")]
+        static extern IntPtr DefWindowProc(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
 
         private DateTime m_lastMouseDownOnTitleBar = DateTime.Now;
         private TimeSpan m_delayUntilMouseMove = new TimeSpan(0, 0, 0, 0, 200); // 200ms
@@ -871,10 +876,11 @@ namespace SuperPutty
             return (lParam >> 16);
         }
 
-        private void WndProcForFocus(ref Message m)
+        private bool WndProcForFocus(ref Message m)
         {
             const int WM_NCLBUTTONDOWN = 0x00A1;
             const int WM_NCMOUSEMOVE = 0x00A0;
+            const int WM_NCACTIVATE = 0x0086;
 
             switch (m.Msg)
             {
@@ -896,9 +902,16 @@ namespace SuperPutty
                         focusCurrentTab();
                     }
                     break;
+                case WM_NCACTIVATE:
+                    // Never allow this window to display itself as inactive
+                    DefWindowProc(this.Handle, m.Msg, (IntPtr)1, m.LParam);
+                    m.Result = (IntPtr)1;
+                    return false;
                 default:
                     break;
             }
+
+            return true;
         }
 
         // Hook into events to handle focus problems.
