@@ -84,6 +84,7 @@
             this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
             this.PasswordTextBox = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
+            this.quickConnectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
@@ -213,7 +214,8 @@
             // windowToolStripMenuItem
             // 
             this.windowToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolbarViewSessions});
+            this.toolbarViewSessions,
+            this.quickConnectToolStripMenuItem});
             this.windowToolStripMenuItem.Name = "windowToolStripMenuItem";
             this.windowToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.windowToolStripMenuItem.Text = "View";
@@ -222,7 +224,7 @@
             // toolbarViewSessions
             // 
             this.toolbarViewSessions.Name = "toolbarViewSessions";
-            this.toolbarViewSessions.Size = new System.Drawing.Size(118, 22);
+            this.toolbarViewSessions.Size = new System.Drawing.Size(152, 22);
             this.toolbarViewSessions.Text = "Sessions";
             this.toolbarViewSessions.Click += new System.EventHandler(this.ToolbarViewSessionsClick);
             // 
@@ -314,6 +316,7 @@
             tabGradient1.StartColor = System.Drawing.SystemColors.Control;
             tabGradient1.TextColor = System.Drawing.SystemColors.ControlDarkDark;
             autoHideStripSkin1.TabGradient = tabGradient1;
+            autoHideStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
             dockPanelSkin1.AutoHideStripSkin = autoHideStripSkin1;
             tabGradient2.EndColor = System.Drawing.SystemColors.ControlLightLight;
             tabGradient2.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
@@ -328,6 +331,7 @@
             tabGradient3.TextColor = System.Drawing.SystemColors.ControlText;
             dockPaneStripGradient1.InactiveTabGradient = tabGradient3;
             dockPaneStripSkin1.DocumentGradient = dockPaneStripGradient1;
+            dockPaneStripSkin1.TextFont = new System.Drawing.Font("Segoe UI", 9F);
             tabGradient4.EndColor = System.Drawing.SystemColors.ActiveCaption;
             tabGradient4.LinearGradientMode = System.Drawing.Drawing2D.LinearGradientMode.Vertical;
             tabGradient4.StartColor = System.Drawing.SystemColors.GradientActiveCaption;
@@ -473,6 +477,13 @@
             this.toolStripButton1.Text = "Connect";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
+            // quickConnectToolStripMenuItem
+            // 
+            this.quickConnectToolStripMenuItem.Name = "quickConnectToolStripMenuItem";
+            this.quickConnectToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.quickConnectToolStripMenuItem.Text = "Quick connect";
+            this.quickConnectToolStripMenuItem.Click += new System.EventHandler(this.quickConnectToolStripMenuItem_Click);
+            // 
             // frmSuperPutty
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -542,6 +553,7 @@
         private System.Windows.Forms.ToolStripMenuItem newItem;
         private System.Windows.Forms.ToolStripMenuItem newMintty;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem quickConnectToolStripMenuItem;
     }
 }
 

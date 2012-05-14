@@ -156,6 +156,12 @@ namespace SuperPutty
             {
             	showSessionTreeview();
             }
+
+            if (!Classes.Database.GetBooleanKey("ShowQuickConnectBar", true))
+            {
+                this.ConnectToolStrip.Hide();
+            }
+
             /*
              * Parsing CL Arguments
              */
@@ -857,6 +863,23 @@ namespace SuperPutty
 			this.additionalTiming.Checked = val;
         }
 
+
+        private void quickConnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Classes.Database d = new SuperPutty.Classes.Database();
+            d.Open();
+
+            if (this.ConnectToolStrip.Visible)
+            {
+                this.ConnectToolStrip.Hide();
+                d.SetKey("ShowQuickConnectBar", "false");
+            }
+            else
+            {
+                this.ConnectToolStrip.Show();
+                d.SetKey("ShowQuickConnectBar", "true");
+            }
+        }
 
         #region FocusHacks Code used to get the children window to focus at the right time
         [DllImport("user32.dll")]
