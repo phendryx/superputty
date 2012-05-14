@@ -38,7 +38,7 @@ namespace SuperPutty.Classes
         public WindowTitleTracker(frmSuperPutty form)
         {
             m_form = form;
-            WinEventDelegate procDelegate = new WinEventDelegate(WinEventProc);
+            procDelegate = new WinEventDelegate(WinEventProc);
 
             // Listen for foreground changes across all processes/threads on current desktop...
             m_hook = SetWinEventHook(EVENT_OBJECT_NAMECHANGE, EVENT_OBJECT_NAMECHANGE, IntPtr.Zero,
