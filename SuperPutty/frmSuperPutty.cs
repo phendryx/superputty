@@ -249,6 +249,7 @@ namespace SuperPutty
 
         public void FocusCurrentTab()
         {
+            dockPanel1.Refresh();
             if (dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
@@ -268,7 +269,6 @@ namespace SuperPutty
         {
             FocusCurrentTab();
         }
-
 
         private void frmSuperPutty_Activated(object sender, EventArgs e)
         {
@@ -587,12 +587,7 @@ namespace SuperPutty
         {
             if (this.children.Count > 1)
             {
-                IDockContent content = this.dockPanel1.Contents[1].DockHandler.SetActiveTab(index);
-                if (content != null)
-                {
-                    ctlPuttyPanel p = (ctlPuttyPanel)content;
-                    p.SetFocusToChildApplication();
-                }
+                this.dockPanel1.ActiveContent.DockHandler.SetActiveTab(index);
             }
         }
 
