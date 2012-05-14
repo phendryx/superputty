@@ -241,7 +241,7 @@ namespace SuperPutty
             panel.TabText = title;
         }
 
-        private void focusCurrentTab()
+        public void FocusCurrentTab()
         {
             if (dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
@@ -260,7 +260,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            focusCurrentTab();
+            FocusCurrentTab();
         }
 
 
@@ -862,6 +862,14 @@ namespace SuperPutty
         [DllImport("user32.dll")]
         static extern IntPtr DefWindowProc(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern int RegisterWindowMessage(string lpString);
+
+        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        static extern int RegisterShellHookWindow(IntPtr hWnd);
+
+        private int m_shellHookNotify;
+        private bool m_externalWindow = false;
         private DateTime m_lastMouseDownOnTitleBar = DateTime.Now;
         private TimeSpan m_delayUntilMouseMove = new TimeSpan(0, 0, 0, 0, 200); // 200ms
         private Point m_mouseDownLocation = new Point(0, 0);
@@ -899,7 +907,7 @@ namespace SuperPutty
                     if ((this.m_lastMouseDownOnTitleBar - DateTime.Now < this.m_delayUntilMouseMove)
                             && currentLocation == m_mouseDownLocation)
                     {
-                        focusCurrentTab();
+                        FocusCurrentTab();
                     }
                     break;
                 case WM_NCACTIVATE:
@@ -908,6 +916,28 @@ namespace SuperPutty
                     m.Result = (IntPtr)1;
                     return false;
                 default:
+                    if (m.Msg == m_shellHookNotify)
+                    {
+                        switch (m.WParam.ToInt32())
+                        {
+                            case 4:
+                                IntPtr current = GetForegroundWindow();
+                                if (current != this.Handle && !ContainsChild(current))
+                                {
+                                    m_externalWindow = true;
+                                }
+                                else if (m_externalWindow)
+                                {
+                                    m_externalWindow = false;
+                                    FocusCurrentTab();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+
+
+                    }
                     break;
             }
 
@@ -918,12 +948,14 @@ namespace SuperPutty
         private void focusHacks()
         {
             this.ResizeEnd += HandleResizeEnd;
+            m_shellHookNotify = RegisterWindowMessage("SHELLHOOK");
+            RegisterShellHookWindow(this.Handle);
         }
 
         // Handle various events to keep the child window focused
         private void HandleResizeEnd(Object sender, EventArgs e)
         {
-            focusCurrentTab();
+            FocusCurrentTab();
         }
 
         #endregion
