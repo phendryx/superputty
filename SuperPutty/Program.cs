@@ -47,7 +47,11 @@ namespace SuperPutty
         static void Main(string[] args)
         {
             bool onlyInstance = false;
+#if DEBUG
             Mutex mutex = new Mutex(true, "SuperPutty", out onlyInstance);
+#else
+            Mutex mutex = new Mutex(true, "SuperPuttyRelease", out onlyInstance);
+#endif
             if (!onlyInstance)
             {
                 string strArgs = "";
