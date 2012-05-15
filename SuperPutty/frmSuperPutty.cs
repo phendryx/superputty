@@ -44,6 +44,9 @@ namespace SuperPutty
         [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
         public static extern IntPtr GetForegroundWindow();
 
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(IntPtr hWnd);
+
         private static string _PuttyExe;
         public static string PuttyExe
         {
@@ -948,6 +951,7 @@ namespace SuperPutty
                                 else if (m_externalWindow)
                                 {
                                     m_externalWindow = false;
+                                    BringWindowToTop(this.Handle);
                                     FocusCurrentTab();
                                 }
                                 break;
