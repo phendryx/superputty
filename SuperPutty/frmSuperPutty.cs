@@ -97,6 +97,7 @@ namespace SuperPutty
             m_hotkeys = new GlobalHotkeys();
             m_keyboard = new KeyboardListener(this, m_hotkeys);
             m_titleTracker = new WindowTitleTracker(this);
+            registerHotkeys();
 
             // Check SQLite Database
             openOrCreateSQLiteDatabase();
@@ -186,7 +187,6 @@ namespace SuperPutty
             // Set window state and size
             setWindowStateAndSize();
 
-            registerHotkeys();
 
             focusHacks();
         }
@@ -589,7 +589,7 @@ namespace SuperPutty
 
         private void selectTab(int index)
         {
-            if (this.children.Count > 1)
+            if (this.children.Count > 1 && this.children.Count > (index + 1))
             {
                 this.dockPanel1.ActiveContent.DockHandler.SetActiveTab(index);
             }
@@ -895,6 +895,7 @@ namespace SuperPutty
         private DateTime m_lastMouseDownOnTitleBar = DateTime.Now;
         private TimeSpan m_delayUntilMouseMove = new TimeSpan(0, 0, 0, 0, 200); // 200ms
         private Point m_mouseDownLocation = new Point(0, 0);
+        private RestoreFromMinimizedTracker m_restoreFromMinimized;
 
         private int GET_X_LPARAM(int lParam)
         {
@@ -911,6 +912,11 @@ namespace SuperPutty
             const int WM_NCLBUTTONDOWN = 0x00A1;
             const int WM_NCMOUSEMOVE = 0x00A0;
             const int WM_NCACTIVATE = 0x0086;
+            const int WM_SYSCOMMAND = 0x0112;
+
+            const int SC_MINIMIZE = 0xF030;
+            const int SC_RESTORE = 0xF120;
+            const int SC_DRAGMOVE = 0xF012;
 
             switch (m.Msg)
             {
@@ -937,6 +943,17 @@ namespace SuperPutty
                     DefWindowProc(this.Handle, m.Msg, (IntPtr)1, m.LParam);
                     m.Result = (IntPtr)1;
                     return false;
+                case WM_SYSCOMMAND:
+                    // Removing the last 4 bits. This is necessary because
+                    // maximizing by double click gives you 0xF032, not 0xF030.
+                    switch ((int)m.WParam & 0xFFF0)
+                    {
+                        case SC_MINIMIZE:
+                        case SC_RESTORE:
+                            FocusCurrentTab();
+                            break;
+                    }
+                    break;
                 default:
                     if (m.Msg == m_shellHookNotify)
                     {
@@ -973,6 +990,7 @@ namespace SuperPutty
             this.ResizeEnd += HandleResizeEnd;
             m_shellHookNotify = RegisterWindowMessage("SHELLHOOK");
             RegisterShellHookWindow(this.Handle);
+            m_restoreFromMinimized = new RestoreFromMinimizedTracker(this);
         }
 
         // Handle various events to keep the child window focused
