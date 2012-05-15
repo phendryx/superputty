@@ -74,7 +74,7 @@ namespace SuperPutty.Classes
         /// <param name="character">Character</param>
         /// <param name="keyEvent">Keyboard event</param>
         /// <param name="vkCode">VKCode</param>
-        private delegate void KeyboardCallbackAsync(InterceptKeys.KeyEvent keyEvent, int vkCode, string character);
+        private delegate void KeyboardCallbackAsync(uint keyEvent, int vkCode, string character);
 
         /// <summary>
         /// Actual callback hook.
@@ -92,10 +92,10 @@ namespace SuperPutty.Classes
 
             if (nCode >= 0)
             {
-                if (wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_KEYDOWN ||
-                    wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_KEYUP ||
-                    wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_SYSKEYDOWN ||
-                    wParam.ToUInt32() == (int)InterceptKeys.KeyEvent.WM_SYSKEYUP)
+                if (wParam.ToUInt32() == (int)WinAPI.WM.KEYDOWN ||
+                    wParam.ToUInt32() == (int)WinAPI.WM.KEYUP ||
+                    wParam.ToUInt32() == (int)WinAPI.WM.SYSKEYDOWN ||
+                    wParam.ToUInt32() == (int)WinAPI.WM.SYSKEYUP)
                 {
                     // Captures the character(s) pressed only on WM_KEYDOWN
                     // NOTE: Currently not used because it's causing a bug :( -ak
@@ -108,7 +108,7 @@ namespace SuperPutty.Classes
                     int vkCode = Marshal.ReadInt32(lParam);
 
                     Key key = System.Windows.Input.KeyInterop.KeyFromVirtualKey(vkCode);
-                    hookedKeyboardCallbackAsync.BeginInvoke((InterceptKeys.KeyEvent)wParam.ToUInt32(), vkCode, chars, null, null);
+                    hookedKeyboardCallbackAsync.BeginInvoke(wParam.ToUInt32(), vkCode, chars, null, null);
 
                     if (this.hotkeys.GetHotkey(key) != GlobalHotkeys.Purpose.None
                             && this.form.ContainsForegroundWindow())
@@ -137,26 +137,26 @@ namespace SuperPutty.Classes
         /// <param name="keyEvent">Keyboard event</param>
         /// <param name="vkCode">VKCode</param>
         /// <param name="character">Character as string.</param>
-        void KeyboardListener_KeyboardCallbackAsync(InterceptKeys.KeyEvent keyEvent, int vkCode, string character)
+        void KeyboardListener_KeyboardCallbackAsync(uint keyEvent, int vkCode, string character)
         {
             switch (keyEvent)
             {
                 // KeyDown events
-                case InterceptKeys.KeyEvent.WM_KEYDOWN:
+                case WinAPI.WM.KEYDOWN:
                     if (KeyDown != null)
                         dispatcher.BeginInvoke(new RawKeyEventHandler(KeyDown), this, new RawKeyEventArgs(vkCode, false, character));
                     break;
-                case InterceptKeys.KeyEvent.WM_SYSKEYDOWN:
+                case WinAPI.WM.SYSKEYDOWN:
                     if (KeyDown != null)
                         dispatcher.BeginInvoke(new RawKeyEventHandler(KeyDown), this, new RawKeyEventArgs(vkCode, true, character));
                     break;
 
                 // KeyUp events
-                case InterceptKeys.KeyEvent.WM_KEYUP:
+                case WinAPI.WM.KEYUP:
                     if (KeyUp != null)
                         dispatcher.BeginInvoke(new RawKeyEventHandler(KeyUp), this, new RawKeyEventArgs(vkCode, false, character));
                     break;
-                case InterceptKeys.KeyEvent.WM_SYSKEYUP:
+                case WinAPI.WM.SYSKEYUP:
                     if (KeyUp != null)
                         dispatcher.BeginInvoke(new RawKeyEventHandler(KeyUp), this, new RawKeyEventArgs(vkCode, true, character));
                     break;
@@ -246,32 +246,6 @@ namespace SuperPutty.Classes
     internal static class InterceptKeys
     {
         public static int WH_KEYBOARD_LL = 13;
-
-        /// <summary>
-        /// Key event
-        /// </summary>
-        public enum KeyEvent : int
-        {
-            /// <summary>
-            /// Key down
-            /// </summary>
-            WM_KEYDOWN = 256,
-
-            /// <summary>
-            /// Key up
-            /// </summary>
-            WM_KEYUP = 257,
-
-            /// <summary>
-            /// System key up
-            /// </summary>
-            WM_SYSKEYUP = 261,
-
-            /// <summary>
-            /// System key down
-            /// </summary>
-            WM_SYSKEYDOWN = 260
-        }
 
         public static IntPtr SetHook(WinAPI.LowLevelKeyboardProc proc)
         {
