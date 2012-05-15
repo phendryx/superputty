@@ -135,6 +135,7 @@ namespace SuperPutty
             InitializeComponent();
 
 #if DEBUG
+            menuStrip1.BackColor = Color.Pink;
             // Only show the option for the debug log viewer when we're compiled with DEBUG defined.
             debugLogToolStripMenuItem.Visible = true;
 #endif
