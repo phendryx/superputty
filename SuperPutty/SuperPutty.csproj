@@ -101,6 +101,7 @@
     <Compile Include="Classes\GlobalHotkeys.cs" />
     <Compile Include="Classes\KeyboardListener.cs" />
     <Compile Include="Classes\RestoreFromMinimizedTracker.cs" />
+    <Compile Include="Classes\WinAPI.cs" />
     <Compile Include="Classes\WindowEventHandler.cs" />
     <Compile Include="Classes\WindowTitleTracker.cs" />
     <Compile Include="ctlApplicationPanel.cs">

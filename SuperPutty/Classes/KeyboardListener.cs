@@ -32,7 +32,7 @@ namespace SuperPutty.Classes
             this.dispatcher = Dispatcher.CurrentDispatcher;
 
             // We have to store the LowLevelKeyboardProc, so that it is not garbage collected runtime
-            hookedLowLevelKeyboardProc = (InterceptKeys.LowLevelKeyboardProc)LowLevelKeyboardProc;
+            hookedLowLevelKeyboardProc = (WinAPI.LowLevelKeyboardProc)LowLevelKeyboardProc;
 
             // Set the hook
             hookId = InterceptKeys.SetHook(hookedLowLevelKeyboardProc);
@@ -118,7 +118,7 @@ namespace SuperPutty.Classes
                 }
             }
 
-            return InterceptKeys.CallNextHookEx(hookId, nCode, wParam, lParam);
+            return WinAPI.CallNextHookEx(hookId, nCode, wParam, lParam);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace SuperPutty.Classes
         /// <summary>
         /// Contains the hooked callback in runtime.
         /// </summary>
-        private InterceptKeys.LowLevelKeyboardProc hookedLowLevelKeyboardProc;
+        private WinAPI.LowLevelKeyboardProc hookedLowLevelKeyboardProc;
 
         /// <summary>
         /// HookCallbackAsync procedure that calls accordingly the KeyDown or KeyUp events.
@@ -176,7 +176,7 @@ namespace SuperPutty.Classes
         /// </summary>
         public void Dispose()
         {
-            InterceptKeys.UnhookWindowsHookEx(hookId);
+            WinAPI.UnhookWindowsHookEx(hookId);
         }
 
         #endregion
@@ -245,7 +245,6 @@ namespace SuperPutty.Classes
     /// </summary>
     internal static class InterceptKeys
     {
-        public delegate IntPtr LowLevelKeyboardProc(int nCode, UIntPtr wParam, IntPtr lParam);
         public static int WH_KEYBOARD_LL = 13;
 
         /// <summary>
@@ -274,61 +273,21 @@ namespace SuperPutty.Classes
             WM_SYSKEYDOWN = 260
         }
 
-        public static IntPtr SetHook(LowLevelKeyboardProc proc)
+        public static IntPtr SetHook(WinAPI.LowLevelKeyboardProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
             {
-                return SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
+                return WinAPI.SetWindowsHookEx(WH_KEYBOARD_LL, proc, WinAPI.GetModuleHandle(curModule.ModuleName), 0);
             }
         }
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr SetWindowsHookEx(int idHook, LowLevelKeyboardProc lpfn, IntPtr hMod, uint dwThreadId);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool UnhookWindowsHookEx(IntPtr hhk);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, UIntPtr wParam, IntPtr lParam);
-
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr GetModuleHandle(string lpModuleName);
 
         #region Convert VKCode to string
         // Note: Sometimes single VKCode represents multiple chars, thus string. 
         // E.g. typing "^1" (notice that when pressing 1 the both characters appear, 
         // because of this behavior, "^" is called dead key)
 
-        [DllImport("user32.dll")]
-        private static extern int ToUnicodeEx(uint wVirtKey, uint wScanCode, byte[] lpKeyState, [Out, MarshalAs(UnmanagedType.LPWStr)] System.Text.StringBuilder pwszBuff, int cchBuff, uint wFlags, IntPtr dwhkl);
 
-        [DllImport("user32.dll")]
-        private static extern bool GetKeyboardState(byte[] lpKeyState);
-
-        [DllImport("user32.dll")]
-        private static extern uint MapVirtualKeyEx(uint uCode, uint uMapType, IntPtr dwhkl);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        private static extern IntPtr GetKeyboardLayout(uint dwLayout);
-
-        [DllImport("User32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("User32.dll")]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-        [DllImport("user32.dll")]
-        private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
-
-        [DllImport("kernel32.dll")]
-        private static extern uint GetCurrentThreadId();
-
-        private static uint lastVKCode = 0;
-        private static uint lastScanCode = 0;
-        private static byte[] lastKeyState = new byte[255];
-        private static bool lastIsDead = false;
 
 // The reason to not use this at all is because there's a bug in here somewhere.
 // The purpose of this function is to get the character that was pressed. The problem
@@ -336,6 +295,10 @@ namespace SuperPutty.Classes
 // the focus away from an active window that is not ours. Look at usage at line ~100
 // to see how it is used.
 #if FALSE
+        private static uint lastVKCode = 0;
+        private static uint lastScanCode = 0;
+        private static byte[] lastKeyState = new byte[255];
+        private static bool lastIsDead = false;
 
         /// <summary>
         /// Convert VKCode to Unicode.

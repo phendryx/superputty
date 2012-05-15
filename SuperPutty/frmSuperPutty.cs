@@ -41,12 +41,6 @@ namespace SuperPutty
 {
     public partial class frmSuperPutty : Form
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        public static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool BringWindowToTop(IntPtr hWnd);
-
         private static string _PuttyExe;
         public static string PuttyExe
         {
@@ -216,7 +210,7 @@ namespace SuperPutty
 
         public bool ContainsForegroundWindow()
         {
-            return ContainsChild(GetForegroundWindow());
+            return ContainsChild(WinAPI.GetForegroundWindow());
         }
 
         public bool ContainsChild(IntPtr child)
@@ -591,7 +585,7 @@ namespace SuperPutty
         {
             if (this.children.Count > 1 && this.children.Count > (index + 1))
             {
-                this.dockPanel1.ActiveContent.DockHandler.SetActiveTab(index);
+                this.dockPanel1.Contents[1].DockHandler.SetActiveTab(index);
             }
         }
 
@@ -881,14 +875,6 @@ namespace SuperPutty
         }
 
         #region FocusHacks Code used to get the children window to focus at the right time
-        [DllImport("user32.dll")]
-        static extern IntPtr DefWindowProc(IntPtr hWnd, int uMsg, IntPtr wParam, IntPtr lParam);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern int RegisterWindowMessage(string lpString);
-
-        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
-        static extern int RegisterShellHookWindow(IntPtr hWnd);
 
         private int m_shellHookNotify;
         private bool m_externalWindow = false;
@@ -909,17 +895,12 @@ namespace SuperPutty
 
         private bool WndProcForFocus(ref Message m)
         {
-            const int WM_NCLBUTTONDOWN = 0x00A1;
-            const int WM_NCMOUSEMOVE = 0x00A0;
-            const int WM_NCACTIVATE = 0x0086;
-            const int WM_SYSCOMMAND = 0x0112;
-
             const int SC_MAXIMIZE = 0xF030;
             const int SC_RESTORE = 0xF120;
 
-            switch (m.Msg)
+            switch ((uint)m.Msg)
             {
-                case WM_NCLBUTTONDOWN:
+                case WinAPI.WM.NCLBUTTONDOWN:
                     // This is in conjunction with the WM_NCMOUSEMOVE. We cannot detect
                     // WM_NCLBUTTONUP because it gets swallowed up on many occasions. As a result
                     // we detect the button down and check the NCMOUSEMOVE to see if it has
@@ -929,7 +910,7 @@ namespace SuperPutty
                     this.m_lastMouseDownOnTitleBar = DateTime.Now;
                     m_mouseDownLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
                     break;
-                case WM_NCMOUSEMOVE:
+                case WinAPI.WM.NCMOUSEMOVE:
                     Point currentLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
                     if ((this.m_lastMouseDownOnTitleBar - DateTime.Now < this.m_delayUntilMouseMove)
                             && currentLocation == m_mouseDownLocation)
@@ -937,12 +918,12 @@ namespace SuperPutty
                         FocusCurrentTab();
                     }
                     break;
-                case WM_NCACTIVATE:
+                case WinAPI.WM.NCACTIVATE:
                     // Never allow this window to display itself as inactive
-                    DefWindowProc(this.Handle, m.Msg, (IntPtr)1, m.LParam);
+                    WinAPI.DefWindowProc(this.Handle, m.Msg, (IntPtr)1, m.LParam);
                     m.Result = (IntPtr)1;
                     return false;
-                case WM_SYSCOMMAND:
+                case WinAPI.WM.SYSCOMMAND:
                     // Check for maximizing and restoring from maxed.
                     // Removing the last 4 bits. This is necessary because
                     // maximizing by double click gives you 0xF032, not 0xF030.
@@ -960,7 +941,7 @@ namespace SuperPutty
                         switch (m.WParam.ToInt32())
                         {
                             case 4:
-                                IntPtr current = GetForegroundWindow();
+                                IntPtr current = WinAPI.GetForegroundWindow();
                                 if (current != this.Handle && !ContainsChild(current))
                                 {
                                     m_externalWindow = true;
@@ -968,7 +949,7 @@ namespace SuperPutty
                                 else if (m_externalWindow)
                                 {
                                     m_externalWindow = false;
-                                    BringWindowToTop(this.Handle);
+                                    WinAPI.BringWindowToTop(this.Handle);
                                     FocusCurrentTab();
                                 }
                                 break;
@@ -988,8 +969,8 @@ namespace SuperPutty
         private void focusHacks()
         {
             this.ResizeEnd += HandleResizeEnd;
-            m_shellHookNotify = RegisterWindowMessage("SHELLHOOK");
-            RegisterShellHookWindow(this.Handle);
+            m_shellHookNotify = WinAPI.RegisterWindowMessage("SHELLHOOK");
+            WinAPI.RegisterShellHookWindow(this.Handle);
             m_restoreFromMinimized = new RestoreFromMinimizedTracker(this);
         }
 

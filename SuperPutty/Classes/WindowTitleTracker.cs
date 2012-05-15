@@ -9,11 +9,10 @@ namespace SuperPutty.Classes
     class WindowTitleTracker : WindowEventHandler
     {
         // Constants from winuser.h
-        const uint EVENT_OBJECT_NAMECHANGE = 0x800C;
 
         public WindowTitleTracker(frmSuperPutty form) : base(form)
         {
-            HookEvent(EVENT_OBJECT_NAMECHANGE);
+            HookEvent(WinAPI.EVENT_OBJECT_NAMECHANGE);
         }
 
         protected override void WinEventProc(IntPtr hWinEventHook, uint eventType,
@@ -21,9 +20,9 @@ namespace SuperPutty.Classes
         {
             if (hwnd != this.m_form.Handle && this.m_form.ContainsChild(hwnd))
             {
-                int capacity = GetWindowTextLength(new HandleRef(this, hwnd)) * 2;
+                int capacity = WinAPI.GetWindowTextLength(new HandleRef(this, hwnd)) * 2;
                 StringBuilder stringBuilder = new StringBuilder(capacity);
-                GetWindowText(new HandleRef(this, hwnd), stringBuilder, stringBuilder.Capacity);
+                WinAPI.GetWindowText(new HandleRef(this, hwnd), stringBuilder, stringBuilder.Capacity);
                 this.m_form.SetPanelTitle(hwnd, stringBuilder.ToString());
             }
         }

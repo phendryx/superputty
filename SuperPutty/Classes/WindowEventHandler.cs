@@ -8,24 +8,7 @@ namespace SuperPutty.Classes
 {
     abstract class WindowEventHandler : IDisposable
     {
-        delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType,
-            IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
-
-        [DllImport("user32.dll")]
-        static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr
-           hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess,
-           uint idThread, uint dwFlags);
-
-        [DllImport("user32.dll")]
-        static extern bool UnhookWinEvent(IntPtr hWinEventHook);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetWindowTextLength(HandleRef hWnd);
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetWindowText(HandleRef hWnd, StringBuilder lpString, int nMaxCount);
-
-        WinEventDelegate procDelegate;
+        WinAPI.WinEventDelegate procDelegate;
 
         protected IntPtr m_hook = IntPtr.Zero;
         protected frmSuperPutty m_form;
@@ -37,10 +20,10 @@ namespace SuperPutty.Classes
 
         protected void HookEvent(uint eventType)
         {
-            procDelegate = new WinEventDelegate(WinEventProc);
+            procDelegate = new WinAPI.WinEventDelegate(WinEventProc);
 
             // Listen for foreground changes across all processes/threads on current desktop...
-            m_hook = SetWinEventHook(eventType, eventType, IntPtr.Zero,
+            m_hook = WinAPI.SetWinEventHook(eventType, eventType, IntPtr.Zero,
                     procDelegate, 0, 0, 0);
         }
 
@@ -53,7 +36,7 @@ namespace SuperPutty.Classes
         {
             if (this.m_hook != IntPtr.Zero)
             {
-                UnhookWinEvent(m_hook);
+                WinAPI.UnhookWinEvent(m_hook);
             }
         }
 
