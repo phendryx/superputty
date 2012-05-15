@@ -914,9 +914,8 @@ namespace SuperPutty
             const int WM_NCACTIVATE = 0x0086;
             const int WM_SYSCOMMAND = 0x0112;
 
-            const int SC_MINIMIZE = 0xF030;
+            const int SC_MAXIMIZE = 0xF030;
             const int SC_RESTORE = 0xF120;
-            const int SC_DRAGMOVE = 0xF012;
 
             switch (m.Msg)
             {
@@ -944,11 +943,12 @@ namespace SuperPutty
                     m.Result = (IntPtr)1;
                     return false;
                 case WM_SYSCOMMAND:
+                    // Check for maximizing and restoring from maxed.
                     // Removing the last 4 bits. This is necessary because
                     // maximizing by double click gives you 0xF032, not 0xF030.
                     switch ((int)m.WParam & 0xFFF0)
                     {
-                        case SC_MINIMIZE:
+                        case SC_MAXIMIZE:
                         case SC_RESTORE:
                             FocusCurrentTab();
                             break;
