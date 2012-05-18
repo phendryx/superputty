@@ -37,6 +37,15 @@ namespace SuperPutty
     public class ApplicationPanel : System.Windows.Forms.Panel
     {
 
+        public event DataReceivedEventHandler OutputDataReceived;
+        protected virtual void OnOutputDataReceived(DataReceivedEventArgs e)
+        {
+            if (OutputDataReceived != null)
+            {
+                OutputDataReceived(this, e);
+            }
+        }
+
         /*************************** Begin Hack to watch for windows focus change events **************************************
          * This is based on this form post:
          * http://social.msdn.microsoft.com/Forums/en-US/clr/thread/c04e343f-f2e7-469a-8a54-48ca84f78c28
@@ -138,6 +147,11 @@ namespace SuperPutty
                 && !WinAPI.SetForegroundWindow(this.m_AppWin));
         }
 
+        private void m_Process_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            OnOutputDataReceived(e);
+        }
+
         /// <summary>
         /// Create (start) the hosted application when the parent becomes visible
         /// </summary>
@@ -156,6 +170,9 @@ namespace SuperPutty
                     //m_Process.Exited += new EventHandler(p_Exited);
                     m_Process.StartInfo.FileName = ApplicationName;
                     m_Process.StartInfo.Arguments = ApplicationParameters;
+                    m_Process.StartInfo.RedirectStandardOutput = true;
+                    m_Process.StartInfo.UseShellExecute = false;
+                    m_Process.OutputDataReceived += m_Process_OutputDataReceived;
 
                     m_Process.Exited += delegate(object sender, EventArgs ev)
                     {
@@ -163,6 +180,7 @@ namespace SuperPutty
                     };
 
                     m_Process.Start();
+                    m_Process.BeginOutputReadLine();
 
                     // Wait for application to start and become idle
                     m_Process.WaitForInputIdle();

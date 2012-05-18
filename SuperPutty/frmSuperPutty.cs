@@ -91,6 +91,7 @@ namespace SuperPutty
             m_hotkeys = new GlobalHotkeys();
             m_keyboard = new KeyboardListener(this, m_hotkeys);
             m_titleTracker = new WindowTitleTracker(this);
+            //m_outputDetector = new MinttyOutputDetector(this, m_outputMapping);
             registerHotkeys();
 
             // Check SQLite Database
@@ -258,6 +259,11 @@ namespace SuperPutty
             }
         }
 
+        public bool IsActiveDocument(ctlPuttyPanel panel)
+        {
+            return panel == (ctlPuttyPanel)dockPanel1.ActiveDocument;
+        }
+
         /// <summary>
         /// Handles focusing on tabs/windows which host PuTTY
         /// </summary>
@@ -266,6 +272,8 @@ namespace SuperPutty
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
             FocusCurrentTab();
+            dockPanel1.ActiveDocument.TabTextColor = null;
+            dockPanel1.ActiveDocument.DockHandler.RefreshPaneChanges();
         }
 
         private void frmSuperPutty_Activated(object sender, EventArgs e)

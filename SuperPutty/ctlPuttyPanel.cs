@@ -26,6 +26,9 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 
 namespace SuperPutty
@@ -39,6 +42,7 @@ namespace SuperPutty
         private SessionData m_Session;
         private PuttyClosedCallback m_ApplicationExit;
         private frmSuperPutty m_SuperPutty;
+        private bool m_hasData = false;
 
         public string ApplicationTitle
         {
@@ -64,7 +68,7 @@ namespace SuperPutty
             }
             else
             {
-                this.ApplicationParameters = "/bin/bash -l";
+                this.ApplicationParameters = "-l - /bin/bash -l";
             }
 
             InitializeComponent();
@@ -89,8 +93,27 @@ namespace SuperPutty
             this.Controls.Add(this.applicationwrapper1);
             this.applicationwrapper1.VisibleChanged += applicationwrapper1_VisibleChanged;
             this.applicationwrapper1.HandleDestroyed += applicationwrapper1_HandleDestroyed;
+            this.applicationwrapper1.OutputDataReceived += applicationwrapper1_OutputDataReceived;
 
             this.ResumeLayout();
+        }
+
+        private void applicationwrapper1_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            if (InvokeRequired)
+            {
+                DataReceivedEventHandler handler =
+                    new DataReceivedEventHandler(applicationwrapper1_OutputDataReceived);
+                this.Invoke(handler, new object[] { sender, e });
+                return;
+            }
+            
+            if (!this.m_SuperPutty.IsActiveDocument(this) && !this.m_hasData)
+            {
+                this.m_hasData = true;
+                this.TabTextColor = System.Drawing.Color.DarkRed;
+                this.DockHandler.RefreshPaneChanges();
+            }
         }
 
         /// <summary>
