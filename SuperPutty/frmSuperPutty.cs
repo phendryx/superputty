@@ -250,6 +250,7 @@ namespace SuperPutty
         public void SetPanelTitle(ctlPuttyPanel panel, String title)
         {
             panel.TabText = title;
+            this.Text = title.Replace(" - PuTTY", "") + " - SuperPutty";
         }
 
         public void FocusCurrentTab()
@@ -259,8 +260,10 @@ namespace SuperPutty
             {
                 ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
 
+                /*
                 this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
                 p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
+                */
                 p.SetFocusToChildApplication();
             }
         }

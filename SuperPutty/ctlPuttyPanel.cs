@@ -72,9 +72,7 @@ namespace SuperPutty
             }
 
             InitializeComponent();
-
             this.Text = session.SessionName;
-
             CreatePanel(isPutty);
         }
 
