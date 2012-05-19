@@ -277,9 +277,16 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            FocusCurrentTab();
-            dockPanel1.ActiveDocument.TabTextColor = null;
-            dockPanel1.ActiveDocument.DockHandler.RefreshPaneChanges();
+            if (dockPanel1.ActiveDocument != null)
+            {
+                FocusCurrentTab();
+                dockPanel1.ActiveDocument.TabTextColor = null;
+                dockPanel1.ActiveDocument.DockHandler.RefreshPaneChanges();
+            }
+            else
+            {
+                this.Focus();
+            }
         }
 
         private void frmSuperPutty_Activated(object sender, EventArgs e)
@@ -447,7 +454,7 @@ namespace SuperPutty
                         this.BeginInvoke((MethodInvoker)delegate()
                         {
                             sessionPanel.Close();
-                         });
+                        });
                     }
                     else
                     {
@@ -458,6 +465,7 @@ namespace SuperPutty
 
             sessionPanel = new ctlPuttyPanel(this, sessionData, callback, isPutty);
             sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
+            FocusCurrentTab();
         }
 
         private void newMintty_Click(object sender, EventArgs e)
