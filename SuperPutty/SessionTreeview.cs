@@ -295,9 +295,12 @@ namespace SuperPutty
         
         void SessionTreeviewFormClosed(object sender, FormClosedEventArgs e)
         {
-        	    Classes.Database d = new SuperPutty.Classes.Database();
-        		d.Open();
-        		d.SetKey("ShowSessionTreeview", "false");
+            this.m_SuperPutty.HideSessionTreeview(false);
+            /*
+            Classes.Database d = new SuperPutty.Classes.Database();
+        	d.Open();
+        	d.SetKey("ShowSessionTreeview", "false");
+            */
         }
     }
 }

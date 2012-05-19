@@ -154,12 +154,13 @@ namespace SuperPutty
             m_Sessions = new SessionTreeview(this, dockPanel1);
             if(Classes.Database.GetBooleanKey("ShowSessionTreeview", true))
             {
-            	showSessionTreeview();
+            	ShowSessionTreeview();
             }
 
             if (!Classes.Database.GetBooleanKey("ShowQuickConnectBar", true))
             {
                 this.ConnectToolStrip.Hide();
+                this.quickConnectToolStripMenuItem.Checked = false;
             }
 
             /*
@@ -786,22 +787,36 @@ namespace SuperPutty
         void WindowToolStripMenuItemClick(object sender, EventArgs e)
         {
         }
+
+        public void HideSessionTreeview(bool closeTreeView)
+        {
+            if (closeTreeView)
+            {
+                m_Sessions.Close();
+            }
+            this.toolbarViewSessions.Checked = false;
+            Classes.Database d = new SuperPutty.Classes.Database();
+            Classes.Database.SetKeyStatic("ShowSessionTreeview", "false");
+        }
         
-        private void showSessionTreeview()
+        public void ShowSessionTreeview()
         {
             m_Sessions = new SessionTreeview(this, dockPanel1);
             m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
+            this.toolbarViewSessions.Checked = true;
+            Classes.Database.SetKeyStatic("ShowSessionTreeview", "true");
         }
         
         void ToolbarViewSessionsClick(object sender, EventArgs e)
         {
         	if (m_Sessions.Visible == false)
         	{
-        		showSessionTreeview();
-        		Classes.Database d = new SuperPutty.Classes.Database();
-        		d.Open();
-        		d.SetKey("ShowSessionTreeview", "true");
+        		ShowSessionTreeview();
         	}
+            else
+            {
+                HideSessionTreeview(true);
+            }
         }
         
         
@@ -874,11 +889,13 @@ namespace SuperPutty
             {
                 this.ConnectToolStrip.Hide();
                 d.SetKey("ShowQuickConnectBar", "false");
+                this.quickConnectToolStripMenuItem.Checked = false;
             }
             else
             {
                 this.ConnectToolStrip.Show();
                 d.SetKey("ShowQuickConnectBar", "true");
+                this.quickConnectToolStripMenuItem.Checked = true;
             }
         }
 
