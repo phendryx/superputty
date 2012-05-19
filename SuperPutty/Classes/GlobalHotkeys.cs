@@ -26,7 +26,7 @@ namespace SuperPutty.Classes
 
         public enum Purpose
         {
-            None, NewMinttyTab, Previous, Next, CloseTab,
+            None, NewMinttyTab, Previous, Next, CloseTab, ToggleMenu,
             Tab1 = 100, Tab2, Tab3, Tab4, Tab5, Tab6, Tab7, Tab8, LastTab
         };
 

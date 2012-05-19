@@ -163,6 +163,11 @@ namespace SuperPutty
                 this.quickConnectToolStripMenuItem.Checked = false;
             }
 
+            if (!Classes.Database.GetBooleanKey("ShowTopMenu", true))
+            {
+                this.menuStrip1.Hide();
+            }
+
             /*
              * Parsing CL Arguments
              */
@@ -491,6 +496,7 @@ namespace SuperPutty
         private void registerHotkeys()
         {
             m_hotkeys.RegisterGlobalHotkey(Key.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
+            m_hotkeys.RegisterGlobalHotkey(Key.H, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.ToggleMenu);
             m_hotkeys.RegisterGlobalHotkey(Key.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
             m_hotkeys.RegisterGlobalHotkey(Key.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
             m_hotkeys.RegisterGlobalHotkey(Key.D1, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab1);
@@ -535,6 +541,10 @@ namespace SuperPutty
 
                 case GlobalHotkeys.Purpose.Next:
                     nextTab(1);
+                    break;
+
+                case GlobalHotkeys.Purpose.ToggleMenu:
+                    toggleMenu();
                     break;
 
                 case GlobalHotkeys.Purpose.Tab1:
@@ -595,6 +605,20 @@ namespace SuperPutty
             if (this.children.Count > 1 && this.children.Count > (index + 1))
             {
                 this.dockPanel1.Contents[1].DockHandler.SetActiveTab(index);
+            }
+        }
+
+        private void toggleMenu()
+        {
+            if (this.menuStrip1.Visible)
+            {
+                this.menuStrip1.Hide();
+                Classes.Database.SetKeyStatic("ShowTopMenu", "false");
+            }
+            else
+            {
+                this.menuStrip1.Show();
+                Classes.Database.SetKeyStatic("ShowTopMenu", "true");
             }
         }
 
