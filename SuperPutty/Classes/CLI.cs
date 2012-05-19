@@ -23,7 +23,7 @@ namespace SuperPutty.Classes
             if (args.Length > 0)
             {
                 sessionData = new SessionData();
-                string proto = "", port = "", username = "", puttySession = "", password = "";
+                string port = "", username = "", puttySession = "", password = "";
 
 				if (args[0].StartsWith("ssh:"))
                 {
