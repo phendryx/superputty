@@ -63,10 +63,9 @@ namespace SuperPutty
             this._WinEventDelegate = new WinAPI.WinEventDelegate(WinEventProc);
             m_hWinEventHook = WinAPI.SetWinEventHook(WinAPI.EVENT_SYSTEM_FOREGROUND, WinAPI.EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, this._WinEventDelegate, 0, 0, WinAPI.WINEVENT_OUTOFCONTEXT);
         }
-        
-        protected override void Finalize()
+
+        ~ApplicationPanel()
         {
-            WinAPI.UnhookWinEvent(m_hWinEventHook);            
         }
 
 		//http://social.msdn.microsoft.com/Forums/en-US/clr/thread/c04e343f-f2e7-469a-8a54-48ca84f78c28
@@ -252,8 +251,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
-            base.OnHandleDestroyed(e);
-
+            WinAPI.UnhookWinEvent(m_hWinEventHook);
             if (m_AppWin != IntPtr.Zero)
             {
                 WinAPI.PostMessage(m_AppWin, WinAPI.WM.CLOSE, 0, 0);
@@ -262,6 +260,8 @@ namespace SuperPutty
 
                 m_AppWin = IntPtr.Zero;
             }
+
+            base.OnHandleDestroyed(e);
         }
 
         /// <summary>
