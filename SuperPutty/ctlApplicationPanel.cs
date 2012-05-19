@@ -230,7 +230,7 @@ namespace SuperPutty
 
                 // set window parameters (how it's displayed)
                 int lStyle = WinAPI.GetWindowLong(m_AppWin, WinAPI.GWL_STYLE);
-                lStyle &= ~(WinAPI.WindowStyles.WS_CAPTION
+                lStyle &= ~(WinAPI.WindowStyles.WS_BORDER
                                 | WinAPI.WindowStyles.WS_THICKFRAME
                                 | WinAPI.WindowStyles.WS_MINIMIZE
                                 | WinAPI.WindowStyles.WS_MAXIMIZE
