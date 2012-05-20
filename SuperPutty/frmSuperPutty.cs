@@ -36,6 +36,7 @@ using System.Data.SQLite;
 using SuperPutty.Classes;
 using System.Windows.Input;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace SuperPutty
 {
@@ -259,13 +260,13 @@ namespace SuperPutty
             if (dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
-
-                /*
-                this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
-                p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
-                */
                 p.SetFocusToChildApplication();
             }
+        }
+
+        public ctlPuttyPanel GetAnyPuttyPanelInstance()
+        {
+            return m_panelMapping.Values.OfType<ctlPuttyPanel>().First();
         }
 
         public bool IsActiveDocument(ctlPuttyPanel panel)
@@ -280,7 +281,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            if (dockPanel1.ActiveDocument != null)
+            if (dockPanel1.ActiveDocument != null && dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 FocusCurrentTab();
                 dockPanel1.ActiveDocument.TabTextColor = null;
@@ -581,7 +582,7 @@ namespace SuperPutty
             int tabs = this.children.Count - 1;
             if (tabs > 1)
             {
-                int current = this.dockPanel1.Contents[1].DockHandler.GetCurrentTabIndex();
+                int current = GetAnyPuttyPanelInstance().DockHandler.GetCurrentTabIndex();
                 current += direction;
 
                 if (current < 0)
@@ -615,7 +616,8 @@ namespace SuperPutty
         {
             if (this.children.Count > 1 && this.children.Count > (index + 1))
             {
-                this.dockPanel1.Contents[1].DockHandler.SetActiveTab(index);
+                // We need a ctlPuttyPanel, the only safe way is from our map
+                GetAnyPuttyPanelInstance().DockHandler.SetActiveTab(index);
             }
         }
 
