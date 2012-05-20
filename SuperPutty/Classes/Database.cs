@@ -189,6 +189,12 @@ namespace SuperPutty.Classes
                 {
 					SetKey("pscp_exe", pscpExe);
                 }
+
+                string minttyExe = key.GetValue("MinttyExe", "").ToString();
+                if (File.Exists(minttyExe))
+                {
+                    SetKey("mintty_exe", minttyExe);
+                }
             }
 		}
 		#endregion

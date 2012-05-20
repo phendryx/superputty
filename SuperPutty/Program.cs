@@ -25,6 +25,7 @@ using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Threading;
+using SuperPutty.Classes;
 
 namespace SuperPutty
 {
@@ -38,8 +39,6 @@ namespace SuperPutty
 
     static class Program
     {
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessage(IntPtr hWnd, uint msg, int wParam, IntPtr lParam);
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -47,7 +46,11 @@ namespace SuperPutty
         static void Main(string[] args)
         {
             bool onlyInstance = false;
+#if DEBUG
             Mutex mutex = new Mutex(true, "SuperPutty", out onlyInstance);
+#else
+            Mutex mutex = new Mutex(true, "SuperPuttyRelease", out onlyInstance);
+#endif
             if (!onlyInstance)
             {
                 string strArgs = "";
@@ -71,7 +74,7 @@ namespace SuperPutty
                 Process[] plist = Process.GetProcessesByName("SuperPutty");
                 foreach (Process spProcess in plist)
                 {
-                    SendMessage(spProcess.MainWindowHandle, 0x004A, 0, lpPtr);
+                    WinAPI.SendMessage(spProcess.MainWindowHandle, 0x004A, 0, lpPtr);
                 }
                 Marshal.FreeHGlobal(lpPtr);
             }
