@@ -33,6 +33,10 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using WeifenLuo.WinFormsUI.Docking;
 using System.Data.SQLite;
+using SuperPutty.Classes;
+using System.Windows.Input;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace SuperPutty
 {
@@ -53,6 +57,13 @@ namespace SuperPutty
             set { _PscpExe = value; }
         }
 
+        private static string _MinttyExe;
+        public static string MinttyExe
+        {
+            get { return _MinttyExe; }
+            set { _MinttyExe = value; }
+        }
+
         public static bool IsScpEnabled
         {
             get { return File.Exists(PscpExe); }
@@ -61,11 +72,32 @@ namespace SuperPutty
         private SessionTreeview m_Sessions;
     
 		private Classes.Database m_db;
-		
+
+        private ConcurrentDictionary<IntPtr, bool> children;
+        private ConcurrentDictionary<IntPtr, ctlPuttyPanel> m_panelMapping;
+
+        GlobalHotkeys m_hotkeys;
+        KeyboardListener m_keyboard;
+        WindowTitleTracker m_titleTracker;
+
+        ~frmSuperPutty()
+        {
+            m_keyboard.Dispose();
+        }
+
         public frmSuperPutty(string[] args)
         {
+            this.children = new ConcurrentDictionary<IntPtr, bool>();
+            m_panelMapping = new ConcurrentDictionary<IntPtr, ctlPuttyPanel>();
+            m_hotkeys = new GlobalHotkeys();
+            m_keyboard = new KeyboardListener(this, m_hotkeys);
+            m_titleTracker = new WindowTitleTracker(this);
+            //m_outputDetector = new MinttyOutputDetector(this, m_outputMapping);
+            registerHotkeys();
+
             // Check SQLite Database
             openOrCreateSQLiteDatabase();
+            this.AddChild(this.Handle);
 
             #region Exe Paths
             // Get putty executable path
@@ -80,16 +112,15 @@ namespace SuperPutty
                 PscpExe = this.m_db.GetKey("pscp_exe");
             }
 
+            // Get mintty executable path
+            if (File.Exists(this.m_db.GetKey("mintty_exe")))
+            {
+                MinttyExe = this.m_db.GetKey("mintty_exe");
+            }
+
             if (String.IsNullOrEmpty(PuttyExe))
             {
-                dlgFindPutty dialog = new dlgFindPutty();
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                	this.m_db.SetKey("putty_exe", dialog.PuttyLocation);
-                	this.m_db.SetKey("pscp_exe", dialog.PscpLocation);
-		            PuttyExe = this.m_db.GetKey("putty_exe");
-		            PscpExe = this.m_db.GetKey("pscp_exe");
-                }
+                editLocations();
             }
 
             if (String.IsNullOrEmpty(PuttyExe))
@@ -104,6 +135,7 @@ namespace SuperPutty
             InitializeComponent();
 
 #if DEBUG
+            menuStrip1.BackColor = Color.Pink;
             // Only show the option for the debug log viewer when we're compiled with DEBUG defined.
             debugLogToolStripMenuItem.Visible = true;
 #endif
@@ -115,6 +147,7 @@ namespace SuperPutty
             ProtocolBox.SelectedItem = ProtocolBox.Items[0];
 			
             dockPanel1.ActiveDocumentChanged += dockPanel1_ActiveDocumentChanged;
+            dockPanel1.LostFocus += dockPanel1_ActiveDocumentChanged;
 
             /* 
              * Open the session treeview and dock it on the right
@@ -122,8 +155,20 @@ namespace SuperPutty
             m_Sessions = new SessionTreeview(this, dockPanel1);
             if(Classes.Database.GetBooleanKey("ShowSessionTreeview", true))
             {
-            	showSessionTreeview();
+            	ShowSessionTreeview();
             }
+
+            if (!Classes.Database.GetBooleanKey("ShowQuickConnectBar", true))
+            {
+                this.ConnectToolStrip.Hide();
+                this.quickConnectToolStripMenuItem.Checked = false;
+            }
+
+            if (!Classes.Database.GetBooleanKey("ShowTopMenu", true))
+            {
+                this.menuStrip1.Hide();
+            }
+
             /*
              * Parsing CL Arguments
              */
@@ -143,6 +188,102 @@ namespace SuperPutty
             
             // Set window state and size
             setWindowStateAndSize();
+
+
+            focusHacks();
+        }
+
+        public void AddChild(IntPtr handle)
+        {
+            if (!this.children.ContainsKey(handle))
+            {
+                this.children.TryAdd(handle, true);
+            }
+        }
+
+        public void AddChild(ctlPuttyPanel panel, IntPtr handle)
+        {
+            AddChild(handle);
+            m_panelMapping.TryAdd(handle, panel);
+        }
+
+        public void RemoveChild(IntPtr handle)
+        {
+            bool outValue;
+            if (this.children.ContainsKey(handle))
+            {
+                this.children.TryRemove(handle, out outValue);
+            }
+
+            ctlPuttyPanel panel;
+            if (this.m_panelMapping.ContainsKey(handle))
+            {
+                this.m_panelMapping.TryRemove(handle, out panel);
+            }
+        }
+
+        public bool ContainsForegroundWindow()
+        {
+            return ContainsChild(WinAPI.GetForegroundWindow());
+        }
+
+        public bool ContainsChild(IntPtr child)
+        {
+            return this.children.ContainsKey(child);
+        }
+
+        private void editLocations()
+        {
+            dlgFindPutty dialog = new dlgFindPutty();
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                this.m_db.SetKey("putty_exe", dialog.PuttyLocation);
+                this.m_db.SetKey("pscp_exe", dialog.PscpLocation);
+                this.m_db.SetKey("mintty_exe", dialog.MinttyLocation);
+                PuttyExe = dialog.PuttyLocation;
+                PscpExe = dialog.PscpLocation;
+                MinttyExe = dialog.MinttyLocation;
+            }
+        }
+
+        public void SetPanelTitle(IntPtr handle)
+        {
+            if (this.m_panelMapping.ContainsKey(handle))
+            {
+                SetPanelTitle(this.m_panelMapping[handle]);
+            }
+        }
+
+        public void SetPanelTitle(ctlPuttyPanel panel)
+        {
+            IntPtr handle = panel.GetChildHandle();
+            int capacity = WinAPI.GetWindowTextLength(new HandleRef(this, handle)) * 2;
+            StringBuilder stringBuilder = new StringBuilder(capacity);
+            WinAPI.GetWindowText(new HandleRef(this, handle), stringBuilder, stringBuilder.Capacity);
+
+            panel.TabText = stringBuilder.ToString();
+            this.Text = stringBuilder.ToString().Replace(" - PuTTY", "") + " - SuperPutty";
+        }
+
+        public void FocusCurrentTab()
+        {
+            dockPanel1.Refresh();
+            if (dockPanel1.ActiveDocument is ctlPuttyPanel)
+            {
+                ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
+                SetPanelTitle(p);
+                p.SetFocusToChildApplication();
+            }
+        }
+
+        public ctlPuttyPanel GetAnyPuttyPanelInstance()
+        {
+            return m_panelMapping.Values.OfType<ctlPuttyPanel>().First();
+        }
+
+        public bool IsActiveDocument(ctlPuttyPanel panel)
+        {
+            return panel == (ctlPuttyPanel)dockPanel1.ActiveDocument;
         }
 
         /// <summary>
@@ -152,16 +293,17 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void dockPanel1_ActiveDocumentChanged(object sender, EventArgs e)
         {
-            if (dockPanel1.ActiveDocument is ctlPuttyPanel)
+            if (dockPanel1.ActiveDocument != null && dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
-                ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
-
-	            this.Text = p.ApplicationTitle.Replace(" - PuTTY", "") + " - SuperPutty";
-				p.Text = p.ApplicationTitle.Replace(" - PuTTY", "");
-                p.SetFocusToChildApplication();
+                FocusCurrentTab();
+                ((ctlPuttyPanel)dockPanel1.ActiveDocument).SetTabTextColor(null);
+            }
+            else
+            {
+                this.Focus();
+                this.Text = "SuperPutty";
             }
         }
-
 
         private void frmSuperPutty_Activated(object sender, EventArgs e)
         {
@@ -198,13 +340,7 @@ namespace SuperPutty
 
         private void puTTYScpLocationToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            dlgFindPutty dialog = new dlgFindPutty();
-
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                PuttyExe = dialog.PuttyLocation;
-                PscpExe = dialog.PscpLocation;
-            }
+            editLocations();
         }
 
         private void toolStripMenuItem1_Click(object sender, EventArgs e)
@@ -304,8 +440,13 @@ namespace SuperPutty
 	            }
 			}
         }
-        
+
         public void CreatePuttyPanel(SessionData sessionData)
+        {
+            CreatePuttyPanel(sessionData, true);
+        }
+        
+        public void CreatePuttyPanel(SessionData sessionData, bool isPutty)
         {
             ctlPuttyPanel sessionPanel = null;
 
@@ -329,7 +470,7 @@ namespace SuperPutty
                         this.BeginInvoke((MethodInvoker)delegate()
                         {
                             sessionPanel.Close();
-                         });
+                        });
                     }
                     else
                     {
@@ -338,8 +479,21 @@ namespace SuperPutty
                 }
             };
 
-            sessionPanel = new ctlPuttyPanel(this, sessionData, callback);
+            sessionPanel = new ctlPuttyPanel(this, sessionData, callback, isPutty);
             sessionPanel.Show(dockPanel1, sessionData.LastDockstate);
+            FocusCurrentTab();
+        }
+
+        private void newMintty_Click(object sender, EventArgs e)
+        {
+            launchMintty();
+        }
+
+        private void launchMintty()
+        {
+            SessionData sessionData = new SessionData();
+            sessionData.SessionName = "mintty";
+            CreatePuttyPanel(sessionData, false);
         }
 
         public void CreateRemoteFileListPanel(SessionData sessionData)
@@ -363,16 +517,157 @@ namespace SuperPutty
             }
         }
 
+        private void registerHotkeys()
+        {
+            m_hotkeys.RegisterGlobalHotkey(Key.M, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.NewMinttyTab);
+            m_hotkeys.RegisterGlobalHotkey(Key.H, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.ToggleMenu);
+            m_hotkeys.RegisterGlobalHotkey(Key.Left, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Previous);
+            m_hotkeys.RegisterGlobalHotkey(Key.Right, GlobalHotkeys.MOD_ALT, GlobalHotkeys.Purpose.Next);
+            m_hotkeys.RegisterGlobalHotkey(Key.D1, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab1);
+            m_hotkeys.RegisterGlobalHotkey(Key.D2, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab2);
+            m_hotkeys.RegisterGlobalHotkey(Key.D3, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab3);
+            m_hotkeys.RegisterGlobalHotkey(Key.D4, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab4);
+            m_hotkeys.RegisterGlobalHotkey(Key.D5, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab5);
+            m_hotkeys.RegisterGlobalHotkey(Key.D6, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab6);
+            m_hotkeys.RegisterGlobalHotkey(Key.D7, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab7);
+            m_hotkeys.RegisterGlobalHotkey(Key.D8, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.Tab8);
+            m_hotkeys.RegisterGlobalHotkey(Key.D9, GlobalHotkeys.MOD_CONTROL, GlobalHotkeys.Purpose.LastTab);
+
+            m_keyboard.KeyDown += new RawKeyEventHandler(KListener_KeyDown);
+            m_keyboard.KeyUp += new RawKeyEventHandler(KListener_KeyUp);
+        }
+
+        void KListener_KeyDown(object sender, RawKeyEventArgs args)
+        {
+            m_hotkeys.KeyDown(args.Key);
+            if (ContainsForegroundWindow())
+            {
+                handleHotkeys(args.Key);
+            }
+        }
+
+        void KListener_KeyUp(object sender, RawKeyEventArgs args)
+        {
+            m_hotkeys.KeyUp(args.Key);
+        }
+
+        private void handleHotkeys(Key key)
+        {
+            switch (m_hotkeys.GetHotkey(key))
+            {
+                case GlobalHotkeys.Purpose.NewMinttyTab:
+                    launchMintty();
+                    break;
+
+                case GlobalHotkeys.Purpose.Previous:
+                    nextTab(-1);
+                    break;
+
+                case GlobalHotkeys.Purpose.Next:
+                    nextTab(1);
+                    break;
+
+                case GlobalHotkeys.Purpose.ToggleMenu:
+                    toggleMenu();
+                    break;
+
+                case GlobalHotkeys.Purpose.Tab1:
+                case GlobalHotkeys.Purpose.Tab2:
+                case GlobalHotkeys.Purpose.Tab3:
+                case GlobalHotkeys.Purpose.Tab4:
+                case GlobalHotkeys.Purpose.Tab5:
+                case GlobalHotkeys.Purpose.Tab6:
+                case GlobalHotkeys.Purpose.Tab7:
+                case GlobalHotkeys.Purpose.Tab8:
+                case GlobalHotkeys.Purpose.LastTab:
+                    selectTab(m_hotkeys.GetHotkey(key));
+                    break;
+
+                case GlobalHotkeys.Purpose.None:
+                default:
+                    break;
+            }
+        }
+
+        private void nextTab(int direction)
+        {
+            int tabs = this.children.Count - 1;
+            if (tabs > 1)
+            {
+                int current = GetAnyPuttyPanelInstance().DockHandler.GetCurrentTabIndex();
+                current += direction;
+
+                if (current < 0)
+                {
+                    current = tabs - 1;
+                }
+                else
+                {
+                    current %= tabs;
+                }
+
+                selectTab(current);
+            }
+        }
+
+        private void selectTab(GlobalHotkeys.Purpose tabPosition)
+        {
+            int tabs = this.children.Count - 1;
+            if (tabs > 1)
+            {
+                int index = ((int)tabPosition) % ((int)GlobalHotkeys.Purpose.Tab1);
+                if (tabPosition == GlobalHotkeys.Purpose.LastTab)
+                {
+                    index = this.dockPanel1.Contents.Count - 1;
+                }
+                selectTab(index);
+            }
+        }
+
+        private void selectTab(int index)
+        {
+            if (this.children.Count > 1 && this.children.Count > (index + 1))
+            {
+                // We need a ctlPuttyPanel, the only safe way is from our map
+                GetAnyPuttyPanelInstance().DockHandler.SetActiveTab(index);
+            }
+        }
+
+        private void toggleMenu()
+        {
+            if (this.menuStrip1.Visible)
+            {
+                this.menuStrip1.Hide();
+                Classes.Database.SetKeyStatic("ShowTopMenu", "false");
+            }
+            else
+            {
+                this.menuStrip1.Show();
+                Classes.Database.SetKeyStatic("ShowTopMenu", "true");
+            }
+        }
+
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == 0x004A)
+            const int WM_COPYDATA = 0x004A;
+
+            switch (m.Msg)
             {
-                COPYDATA cd = (COPYDATA) Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
-                string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
-                string[] args = strArgs.Split(' ');
-                ParseClArguments(args);
+                case WM_COPYDATA:
+                    COPYDATA cd = (COPYDATA)Marshal.PtrToStructure(m.LParam, typeof(COPYDATA));
+                    string strArgs = Marshal.PtrToStringAnsi(cd.lpData);
+                    string[] args = strArgs.Split(' ');
+                    ParseClArguments(args);
+                    break;
+                default:
+                    break;
             }
-            base.WndProc(ref m);
+
+            bool callBase = WndProcForFocus(ref m);
+            if (callBase)
+            {
+                base.WndProc(ref m);
+            }
         }
 
         
@@ -503,7 +798,7 @@ namespace SuperPutty
         
 	    private void setAutomaticUpdateCheckMenuItem()
         {
-        	// Get the current value from the database
+        	// Get the current value from the d1Gatabase
         	Classes.Database d = new SuperPutty.Classes.Database();
         	d.Open();
 			string key = "automatic_update_check";
@@ -541,22 +836,36 @@ namespace SuperPutty
         void WindowToolStripMenuItemClick(object sender, EventArgs e)
         {
         }
+
+        public void HideSessionTreeview(bool closeTreeView)
+        {
+            if (closeTreeView)
+            {
+                m_Sessions.Close();
+            }
+            this.toolbarViewSessions.Checked = false;
+            Classes.Database d = new SuperPutty.Classes.Database();
+            Classes.Database.SetKeyStatic("ShowSessionTreeview", "false");
+        }
         
-        private void showSessionTreeview()
+        public void ShowSessionTreeview()
         {
             m_Sessions = new SessionTreeview(this, dockPanel1);
             m_Sessions.Show(dockPanel1, WeifenLuo.WinFormsUI.Docking.DockState.DockRight);
+            this.toolbarViewSessions.Checked = true;
+            Classes.Database.SetKeyStatic("ShowSessionTreeview", "true");
         }
         
         void ToolbarViewSessionsClick(object sender, EventArgs e)
         {
         	if (m_Sessions.Visible == false)
         	{
-        		showSessionTreeview();
-        		Classes.Database d = new SuperPutty.Classes.Database();
-        		d.Open();
-        		d.SetKey("ShowSessionTreeview", "true");
+        		ShowSessionTreeview();
         	}
+            else
+            {
+                HideSessionTreeview(true);
+            }
         }
         
         
@@ -618,5 +927,133 @@ namespace SuperPutty
 			// Set the checked property
 			this.additionalTiming.Checked = val;
         }
+
+
+        private void quickConnectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Classes.Database d = new SuperPutty.Classes.Database();
+            d.Open();
+
+            if (this.ConnectToolStrip.Visible)
+            {
+                this.ConnectToolStrip.Hide();
+                d.SetKey("ShowQuickConnectBar", "false");
+                this.quickConnectToolStripMenuItem.Checked = false;
+            }
+            else
+            {
+                this.ConnectToolStrip.Show();
+                d.SetKey("ShowQuickConnectBar", "true");
+                this.quickConnectToolStripMenuItem.Checked = true;
+            }
+        }
+
+        #region FocusHacks Code used to get the children window to focus at the right time
+
+        private int m_shellHookNotify;
+        private bool m_externalWindow = false;
+        private DateTime m_lastMouseDownOnTitleBar = DateTime.Now;
+        private TimeSpan m_delayUntilMouseMove = new TimeSpan(0, 0, 0, 0, 200); // 200ms
+        private Point m_mouseDownLocation = new Point(0, 0);
+        private RestoreFromMinimizedTracker m_restoreFromMinimized;
+
+        private int GET_X_LPARAM(int lParam)
+        {
+            return (lParam & 0xffff);
+        }
+
+        private int GET_Y_LPARAM(int lParam)
+        {
+            return (lParam >> 16);
+        }
+
+        private bool WndProcForFocus(ref Message m)
+        {
+            const int SC_MAXIMIZE = 0xF030;
+            const int SC_RESTORE = 0xF120;
+
+            switch ((uint)m.Msg)
+            {
+                case WinAPI.WM.NCLBUTTONDOWN:
+                    // This is in conjunction with the WM_NCMOUSEMOVE. We cannot detect
+                    // WM_NCLBUTTONUP because it gets swallowed up on many occasions. As a result
+                    // we detect the button down and check the NCMOUSEMOVE to see if it has
+                    // changed location. If the mouse location is different, then we let
+                    // the resize handler deal with the focus. If not, then we assume that it
+                    // is a mouseup action.
+                    this.m_lastMouseDownOnTitleBar = DateTime.Now;
+                    m_mouseDownLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
+                    break;
+                case WinAPI.WM.NCMOUSEMOVE:
+                    Point currentLocation = new Point(GET_X_LPARAM((int)m.LParam), GET_Y_LPARAM((int)m.LParam));
+                    if ((this.m_lastMouseDownOnTitleBar - DateTime.Now < this.m_delayUntilMouseMove)
+                            && currentLocation == m_mouseDownLocation)
+                    {
+                        FocusCurrentTab();
+                    }
+                    break;
+                case WinAPI.WM.NCACTIVATE:
+                    // Never allow this window to display itself as inactive
+                    WinAPI.DefWindowProc(this.Handle, m.Msg, (IntPtr)1, m.LParam);
+                    m.Result = (IntPtr)1;
+                    return false;
+                case WinAPI.WM.SYSCOMMAND:
+                    // Check for maximizing and restoring from maxed.
+                    // Removing the last 4 bits. This is necessary because
+                    // maximizing by double click gives you 0xF032, not 0xF030.
+                    switch ((int)m.WParam & 0xFFF0)
+                    {
+                        case SC_MAXIMIZE:
+                        case SC_RESTORE:
+                            FocusCurrentTab();
+                            break;
+                    }
+                    break;
+                default:
+                    if (m.Msg == m_shellHookNotify)
+                    {
+                        switch (m.WParam.ToInt32())
+                        {
+                            case 4:
+                                IntPtr current = WinAPI.GetForegroundWindow();
+                                if (current != this.Handle && !ContainsChild(current))
+                                {
+                                    m_externalWindow = true;
+                                }
+                                else if (m_externalWindow)
+                                {
+                                    m_externalWindow = false;
+                                    WinAPI.BringWindowToTop(this.Handle);
+                                    FocusCurrentTab();
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+
+
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+        // Hook into events to handle focus problems.
+        private void focusHacks()
+        {
+            this.ResizeEnd += HandleResizeEnd;
+            m_shellHookNotify = WinAPI.RegisterWindowMessage("SHELLHOOK");
+            WinAPI.RegisterShellHookWindow(this.Handle);
+            m_restoreFromMinimized = new RestoreFromMinimizedTracker(this);
+        }
+
+        // Handle various events to keep the child window focused
+        private void HandleResizeEnd(Object sender, EventArgs e)
+        {
+            FocusCurrentTab();
+        }
+
+        #endregion
     }
 }

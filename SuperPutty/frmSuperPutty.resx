@@ -112,27 +112,27 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <metadata name="ConnectToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="ConnectToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>126, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="toolStripButton1.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAARNJREFUOE9jYBgF
-        JIWA/3TX3aH1oWwkaUJW7Nnv+N2pw/o2hgElxzP+g3Dh4dT/ufsS/2fsiP2ftDHif8zK4P9hC33/+890
-        /+850fF/0uKo/zFzQ/+blOtfRDEEpHndraX/V99Y9H/5tXn/F1+Z9X/+pWn/Z52f/H/qmb7/E051/u8+
-        3vq//Wjj/6ZDtf8DJnr918hUPgk3BGTzyusL/i+9Ouf/wssz/s+9MOX/jHMT/k8+3f2/72T7/85jTf9b
-        Dtf9bzhY9b9mX9l/rx7X/yqJCkfgBuBzNtDP/60bTP+7dtj/j1sY+d+z2+W/UpLieZIDUrdQw0IzU/W7
-        SqLcTZI1wzSoJCnu0ArVIj8aybZ5cGsEANSBlPv0ZW/CAAAAAElFTkSuQmCC
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAETSURBVDhPY2AYBSSFgP90192h9aFsJGlCVuzZ7/jdqcP6
+        NoYBJccz/oNw4eHU/7n7Ev9n7Ij9n7Qx4n/MyuD/YQt9//vPdP/vOdHxf9LiqP8xc0P/m5TrX0QxBKR5
+        3a2l/1ffWPR/+bV5/xdfmfV//qVp/2edn/x/6pm+/xNOdf7vPt76v/1o4/+mQ7X/AyZ6/dfIVD4JNwRk
+        88rrC/4vvTrn/8LLM/7PvTDl/4xzE/5PPt39v+9k+//OY03/Ww7X/W84WPW/Zl/Zf68e1/8qiQpH4Abg
+        czbQz/+tG0z/u3bY/49bGPnfs9vlv1KS4nmSA1K3UMNCM1P1u0qi3E2SNcM0qCQp7tAK1SI/Gsm2eXBr
+        BADUgZT79GVvwgAAAABJRU5ErkJggg==
 </value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
