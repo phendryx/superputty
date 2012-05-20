@@ -276,7 +276,10 @@ namespace SuperPutty
         {
             if (this.m_AppWin != IntPtr.Zero)
             {
-                WinAPI.MoveWindow(m_AppWin, 0, 0, this.Width, this.Height, true);
+                if (this.Width > 0 && this.Height > 0)
+                {
+                    WinAPI.MoveWindow(m_AppWin, 0, 0, this.Width, this.Height, true);
+                }
             }
             base.OnResize(e);
         }
