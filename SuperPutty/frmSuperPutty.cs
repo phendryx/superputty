@@ -214,6 +214,12 @@ namespace SuperPutty
             {
                 this.children.TryRemove(handle, out outValue);
             }
+
+            ctlPuttyPanel panel;
+            if (this.m_panelMapping.ContainsKey(handle))
+            {
+                this.m_panelMapping.TryRemove(handle, out panel);
+            }
         }
 
         public bool ContainsForegroundWindow()
@@ -240,18 +246,23 @@ namespace SuperPutty
             }
         }
 
-        public void SetPanelTitle(IntPtr handle, String title)
+        public void SetPanelTitle(IntPtr handle)
         {
             if (this.m_panelMapping.ContainsKey(handle))
             {
-                SetPanelTitle(this.m_panelMapping[handle], title);
+                SetPanelTitle(this.m_panelMapping[handle]);
             }
         }
 
-        public void SetPanelTitle(ctlPuttyPanel panel, String title)
+        public void SetPanelTitle(ctlPuttyPanel panel)
         {
-            panel.TabText = title;
-            this.Text = title.Replace(" - PuTTY", "") + " - SuperPutty";
+            IntPtr handle = panel.GetChildHandle();
+            int capacity = WinAPI.GetWindowTextLength(new HandleRef(this, handle)) * 2;
+            StringBuilder stringBuilder = new StringBuilder(capacity);
+            WinAPI.GetWindowText(new HandleRef(this, handle), stringBuilder, stringBuilder.Capacity);
+
+            panel.TabText = stringBuilder.ToString();
+            this.Text = stringBuilder.ToString().Replace(" - PuTTY", "") + " - SuperPutty";
         }
 
         public void FocusCurrentTab()
@@ -260,6 +271,7 @@ namespace SuperPutty
             if (dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 ctlPuttyPanel p = (ctlPuttyPanel)dockPanel1.ActiveDocument;
+                SetPanelTitle(p);
                 p.SetFocusToChildApplication();
             }
         }

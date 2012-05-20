@@ -102,7 +102,15 @@ namespace SuperPutty
             {
                 DataReceivedEventHandler handler =
                     new DataReceivedEventHandler(applicationwrapper1_OutputDataReceived);
-                this.Invoke(handler, new object[] { sender, e });
+                try
+                {
+                    this.Invoke(handler, new object[] { sender, e });
+                }
+                catch (Exception)
+                {
+                    // Happens when we close a window and there's nothing left. An exception
+                    // is thrown, we'll just ignore it.
+                }
                 return;
             }
             
@@ -114,6 +122,11 @@ namespace SuperPutty
             }
         }
 
+        public IntPtr GetChildHandle()
+        {
+            return this.applicationwrapper1.GetChildHandle();
+        }
+
         /// <summary>
         /// Adding the child handle into our children. We use this information to decide
         /// when to trigger hotkeys.
@@ -122,7 +135,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void applicationwrapper1_VisibleChanged(object sender, EventArgs e)
         {
-            m_SuperPutty.AddChild(this, this.applicationwrapper1.GetChildHandle());
+            m_SuperPutty.AddChild(this, GetChildHandle());
         }
 
         /// <summary>
@@ -132,7 +145,7 @@ namespace SuperPutty
         /// <param name="e"></param>
         private void applicationwrapper1_HandleDestroyed(object sender, EventArgs e)
         {
-            m_SuperPutty.RemoveChild(this.applicationwrapper1.GetChildHandle());
+            m_SuperPutty.RemoveChild(GetChildHandle());
         }
 
         private void closeSessionToolStripMenuItem_Click(object sender, EventArgs e)
