@@ -116,10 +116,15 @@ namespace SuperPutty
             
             if (!this.m_SuperPutty.IsActiveDocument(this) && !this.m_hasData)
             {
-                this.m_hasData = true;
-                this.TabTextColor = System.Drawing.Color.DarkRed;
-                this.DockHandler.RefreshPaneChanges();
+                SetTabTextColor(Color.DarkRed);
             }
+        }
+
+        public void SetTabTextColor(Color? color)
+        {
+            this.m_hasData = color == null ? false : true;
+            this.TabTextColor = color;
+            this.DockHandler.RefreshPaneChanges();
         }
 
         public IntPtr GetChildHandle()

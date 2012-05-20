@@ -296,12 +296,12 @@ namespace SuperPutty
             if (dockPanel1.ActiveDocument != null && dockPanel1.ActiveDocument is ctlPuttyPanel)
             {
                 FocusCurrentTab();
-                dockPanel1.ActiveDocument.TabTextColor = null;
-                dockPanel1.ActiveDocument.DockHandler.RefreshPaneChanges();
+                ((ctlPuttyPanel)dockPanel1.ActiveDocument).SetTabTextColor(null);
             }
             else
             {
                 this.Focus();
+                this.Text = "SuperPutty";
             }
         }
 
