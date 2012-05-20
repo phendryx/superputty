@@ -41,7 +41,8 @@ I have submitted a patch to mintty at http://code.google.com/p/mintty/issues/det
 What this patch does is that it "clones" the console's output to stdout.
 This version of SuperPutty will detect the output on stdout and sets the color
 of the text on the tab. This lets you know if there are output waiting to
-be seen in another tab.
+be seen in another tab. I will upload the patched version of mintty when I figure
+out how :).
 
 Various hacks for focus
 =======================
