@@ -230,11 +230,7 @@ namespace SuperPutty
 
                 // set window parameters (how it's displayed)
                 int lStyle = WinAPI.GetWindowLong(m_AppWin, WinAPI.GWL_STYLE);
-                lStyle &= ~(WinAPI.WindowStyles.WS_BORDER
-                                | WinAPI.WindowStyles.WS_THICKFRAME
-                                | WinAPI.WindowStyles.WS_MINIMIZE
-                                | WinAPI.WindowStyles.WS_MAXIMIZE
-                                | WinAPI.WindowStyles.WS_SYSMENU);
+                lStyle &= ~(WinAPI.WindowStyles.WS_CAPTION | WinAPI.WindowStyles.WS_THICKFRAME);
                 WinAPI.SetWindowLong(m_AppWin, WinAPI.GWL_STYLE, lStyle);
 
                 // Move the child so it's located over the parent
