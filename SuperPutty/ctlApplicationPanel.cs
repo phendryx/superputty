@@ -251,6 +251,8 @@ namespace SuperPutty
         /// <param name="e"></param>
         protected override void OnHandleDestroyed(EventArgs e)
         {
+            base.OnHandleDestroyed(e);
+
             WinAPI.UnhookWinEvent(m_hWinEventHook);
             if (m_AppWin != IntPtr.Zero)
             {
@@ -260,8 +262,6 @@ namespace SuperPutty
 
                 m_AppWin = IntPtr.Zero;
             }
-
-            base.OnHandleDestroyed(e);
         }
 
         /// <summary>
