@@ -6,9 +6,11 @@
 
 ; Main Install settings
 Name "${APPNAMEANDVERSION}"
-InstallDir "$PROGRAMFILES\SuperPutty"
+;InstallDir "$PROGRAMFILES\SuperPutty"
+InstallDir "$LOCALAPPDATA\SuperPutty"
 InstallDirRegKey HKLM "Software\${APPNAME}" ""
-OutFile "superputty-setup_v1.0.3.exe"
+OutFile "superputty-setup_v1.0.4.exe"
+RequestExecutionLevel user
 
 LicenseData "License.txt"
 LicenseText "If you accept the terms of the agreement, click I Agree to continue. You must accept the agreement to install ${APPNAMEANDVERSION}."
@@ -18,7 +20,7 @@ DirText "Choose the folder in which to install ${APPNAMEANDVERSION}."
 Section "SuperPutty"
 
 	; Set Section properties
-	SetOverwrite on
+	SetOverwrite try
 
 	; Set Section Files and Shortcuts
 	SetOutPath "$INSTDIR\"
@@ -30,6 +32,9 @@ Section "SuperPutty"
 	CreateShortCut "$SMPROGRAMS\SuperPutty\SuperPutty.lnk" "$INSTDIR\SuperPutty.exe"
 	CreateShortCut "$SMPROGRAMS\SuperPutty\Uninstall.lnk" "$INSTDIR\uninstall.exe"
 
+	; This will copy the db3 file from program files if found.  As of 1.0.4, the InstallDir changed.
+	IfFileExists "$PROGRAMFILES\SuperPutty\SuperPutty.db3" 0
+		CopyFiles "$PROGRAMFILES\SuperPutty\SuperPutty.db3" "$INSTDIR\SuperPutty.db3"
 SectionEnd
 
 Section -FinishSection

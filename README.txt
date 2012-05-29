@@ -1,4 +1,4 @@
-Why this version exists
+mintty Integration
 =======================
 I've been using mintty for a while now, but there's no good/free way for me to
 get a feature that I want, tabs! I looked around and decided that this project
@@ -13,7 +13,7 @@ stab at fixing additional problems with it.
 
 Hotkeys
 =======
-This version of SuperPutty now hooks into WH_KEYBOARD_LL to detect hotkeys. At
+SuperPutty now hooks into WH_KEYBOARD_LL to detect hotkeys. At
 first, I tried to use RegisterHotKeys, but that has certain limitations that
 prevented me from using it. However, since I am too lazy to write my own code,
 I've copied and pasted a hook I saw online for WH_KEYBOARD_LL. This required
