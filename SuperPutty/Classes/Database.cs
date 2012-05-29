@@ -84,7 +84,8 @@ namespace SuperPutty.Classes
 		#region Dynamic Methods
 		public SQLiteConnection Open()
 		{
-        	string db_filename = Application.StartupPath + "\\SuperPutty.db3";
+        	//string db_filename = Application.StartupPath + "\\SuperPutty.db3";
+            string db_filename = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "SuperPutty.db3");
         	if (!File.Exists(db_filename))
         	{
         		SQLiteConnection.CreateFile(db_filename);
